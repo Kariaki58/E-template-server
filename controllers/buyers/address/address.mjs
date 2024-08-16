@@ -14,18 +14,31 @@ export const addAddress = async (req, res) => {
         return res.status(400).send({error: "error account"})
     }
 
-    const newAddress = new Address({
-        userId: user,
-        street,
-        city,
-        state,
-        zipCode,
-        country,
-        phoneNumber,
-    });
+    let findAddress = await Address.findOne({ userId: user })
+
+    if (findAddress) {
+        findAddress.street = street
+        findAddress.city = city
+        findAddress.state = state
+        findAddress.zipCode = zipCode
+        findAddress.phoneNumber = phoneNumber
+        findAddress.country = country
+    } else {
+
+        findAddress = new Address({
+            userId: user,
+            street,
+            city,
+            state,
+            zipCode,
+            country,
+            phoneNumber,
+        });
+    }
+
 
     try {
-        const savedAddress = await newAddress.save();
+        const savedAddress = await findAddress.save();
 
         res.status(201).json(savedAddress);
     } catch (error) {
