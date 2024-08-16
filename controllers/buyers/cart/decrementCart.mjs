@@ -13,7 +13,6 @@ export const decrementCart = async (req, res) => {
         return res.status(401).send({ error: "You are not logged in" });
     }
 
-
     let cart = await Cart.findOne({ userId: user });
 
     if (!cart) {

@@ -17,11 +17,9 @@ export const editCart = async (req, res) => {
         return res.status(400).send({ error: "color must be a string"})
     }
     const cart = await Cart.findOne({ userId: _id })
-    console.log(cart)
     if (!cart) {
         return res.status(400).send({ error: "no items in cart"})
     }
-    console.log(cart.items.length)
     if (pos > cart.items.length - 1) {
         return res.status(400).send({error: "invalid position"})
     }
