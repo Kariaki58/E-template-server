@@ -14,7 +14,7 @@ export const register = async (req, res) => {
     const newUser = new User({ email, password: hashedPassword })
 
     await newUser.save()
-    const token = generateToken(email)
+    const token = generateToken(newUser._id)
     res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

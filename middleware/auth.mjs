@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken'
 
 
-export const generateToken = (email) => {
-    return jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '4h' });
+export const generateToken = (_id) => {
+    return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: '4h' });
 };
 
 export const authenticateToken = (req, res, next) => {
@@ -15,7 +15,8 @@ export const authenticateToken = (req, res, next) => {
         if (err) {
             return res.sendStatus(403)
         }
-        req.user = user
+        console.log(user)
+        req.user = user._id
         next()
     })
 }

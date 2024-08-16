@@ -14,8 +14,8 @@ const order = new mongoose.Schema({
     ],
     totalPrice: Number,
     currency: String,
-    shippingAddress: ObjectId,
-    billingAddress: ObjectId,
+    shippingAddress: mongoose.Schema.ObjectId,
+    billingAddress: mongoose.Schema.ObjectId,
     status: String
 }, { timeseries: true })
 

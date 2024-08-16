@@ -8,7 +8,7 @@ const categorySchema = new Schema({
         required: true,
         unique: true
     }
-}, { timestamps: true }); // Correct placement of timestamps
+}, { timestamps: true })
 
 const Category = model('Category', categorySchema);
 

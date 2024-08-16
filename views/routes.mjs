@@ -8,6 +8,13 @@ import { isAdmin } from "../middleware/isAdmin.mjs";
 import { editProduct } from "../controllers/sellers/editProduct.mjs";
 import { deleteProduct } from '../controllers/sellers/deleteProduct.mjs';
 import { signout } from "../controllers/authentication/signout.mjs";
+import { getUploads } from "../controllers/sellers/getUploads.mjs";
+import { addToCart } from "../controllers/buyers/cart/addToCart.mjs";
+import { removeFromCart } from "../controllers/buyers/cart/deleteFromCart.mjs";
+import { incrementCart } from "../controllers/buyers/cart/incrementCart.mjs";
+import { getUserCart } from "../controllers/buyers/cart/carts.mjs";
+import { decrementCart } from "../controllers/buyers/cart/decrementCart.mjs";
+import { editCart } from "../controllers/buyers/cart/editCart.mjs";
 
 
 const route = Router()
@@ -19,9 +26,17 @@ route.post('/signout', signout)
 route.get('/protected', authenticateToken, (req, res) => {
     res.json({ message: 'This is a protected route', user:req.user })
 })
-route.post('/upload/product', authenticateToken, isAdmin, uploadProducts)
-route.put('/upload/product', authenticateToken, isAdmin, editProduct)
-route.delete('/upload/product', authenticateToken, isAdmin, deleteProduct);
 
+route.get('/upload/product', getUploads)
+route.post('/upload/add', authenticateToken, isAdmin, uploadProducts)
+route.put('/upload/edit', authenticateToken, isAdmin, editProduct)
+route.delete('/upload/delete', authenticateToken, isAdmin, deleteProduct);
+
+route.get('/cart', authenticateToken, getUserCart)
+route.post('/cart/add', authenticateToken, addToCart)
+route.put('/cart/edit', authenticateToken, editCart)
+route.patch('/cart/increment', authenticateToken, incrementCart)
+route.patch('/cart/decrement', authenticateToken, decrementCart)
+route.delete('/cart/delete', authenticateToken, removeFromCart)
 
 export default route

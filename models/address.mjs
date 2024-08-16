@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 
 const address = mongoose.Schema({
-    userId: ObjectId,
+    userId: mongoose.Schema.ObjectId,
     street: String,
     city: String,
     state: String,

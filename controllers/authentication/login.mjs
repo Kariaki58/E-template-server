@@ -15,7 +15,7 @@ export const login = async (req, res) => {
         return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    const token = generateToken(user.email);
+    const token = generateToken(user._id);
     res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

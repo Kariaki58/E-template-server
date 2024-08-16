@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 
 const transaction = mongoose.Schema({
-    orderId: ObjectId,
-    userId: ObjectId,
+    orderId: mongoose.Schema.ObjectId,
+    userId: mongoose.Schema.ObjectId,
     amount: Number,
     currency: String,
     paymentMethod: String,

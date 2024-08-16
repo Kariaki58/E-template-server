@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 
 
 const reviews = mongoose.Schema({
-    productId: ObjectId,
-    userId: ObjectId,
+    productId: mongoose.Schema.ObjectId,
+    userId: mongoose.Schema.ObjectId,
     rating: Number,
     comment: String,
     reviewImage: String,
