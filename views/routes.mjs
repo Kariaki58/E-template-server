@@ -15,6 +15,7 @@ import { incrementCart } from "../controllers/buyers/cart/incrementCart.mjs";
 import { getUserCart } from "../controllers/buyers/cart/carts.mjs";
 import { decrementCart } from "../controllers/buyers/cart/decrementCart.mjs";
 import { editCart } from "../controllers/buyers/cart/editCart.mjs";
+import { addAddress } from "../controllers/buyers/address/address.mjs";
 
 
 const route = Router()
@@ -38,5 +39,6 @@ route.put('/cart/edit', authenticateToken, editCart)
 route.patch('/cart/increment', authenticateToken, incrementCart)
 route.patch('/cart/decrement', authenticateToken, decrementCart)
 route.delete('/cart/delete', authenticateToken, removeFromCart)
+route.post('/address/add', authenticateToken, addAddress)
 
 export default route

@@ -28,10 +28,6 @@ const address = mongoose.Schema({
     phoneNumber: {
         type: String,
         required: true
-    },
-    countryCode: {
-        type: String,
-        required: true
     }
 }, { timestampes: true })
 
