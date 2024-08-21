@@ -18,9 +18,16 @@ import { editCart } from "../controllers/buyers/cart/editCart.mjs";
 import { addAddress } from "../controllers/buyers/address/address.mjs";
 import { addOrder } from "../controllers/buyers/orders/addOrder.mjs";
 import { getOrders } from "../controllers/buyers/orders/getOrders.mjs";
+import { getProductReview } from "../controllers/buyers/reviews/getReview.mjs";
+import { addReview } from "../controllers/buyers/reviews/addReview.mjs";
+import { editReview } from "../controllers/buyers/reviews/editReview.mjs";
+import { removeReview } from "../controllers/buyers/reviews/removeReview.mjs";
+import { category } from "../controllers/category.mjs";
+import { generateSignature } from "../utils/cloudinary.mjs";
 
 
 const route = Router()
+
 
 route.get("/", home)
 route.post('/register', register)
@@ -40,9 +47,15 @@ route.post('/cart/add', authenticateToken, addToCart)
 route.put('/cart/edit', authenticateToken, editCart)
 route.patch('/cart/increment', authenticateToken, incrementCart)
 route.patch('/cart/decrement', authenticateToken, decrementCart)
-route.delete('/cart/delete', authenticateToken, removeFromCart)
+route.delete('/delete/cart/:pos/:cid', authenticateToken, removeFromCart)
 route.post('/address/add', authenticateToken, addAddress)
 route.post('/order/add', authenticateToken, addOrder)
 route.get('/order/get', authenticateToken, getOrders)
+route.get('/category/get', category)
+route.get('/review/get', getProductReview)
+route.post('/review/add', addReview)
+route.put('/review/edit', editReview)
+route.delete('/review/delete', removeReview)
+route.post('/api/gensignature', authenticateToken, isAdmin, generateSignature)
 
 export default route

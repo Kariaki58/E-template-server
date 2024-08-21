@@ -27,7 +27,7 @@ const cartSchema = new Schema({
                 min: 1
             },
             price: {
-                type: mongoose.Types.Decimal128,
+                type: Number,
                 required: true,
                 min: 0
             }

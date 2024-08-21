@@ -1,23 +1,22 @@
 import Product from "../../models/products.mjs";
 import Category from "../../models/categories.mjs";
-import mongoose from "mongoose";
+
 
 export const uploadProducts = async (req, res) => {
     try {
         const { 
-            name, 
+            productName: name, 
             description, 
             gender, 
             percentOff, 
-            sizes, 
-            colors,
+            size: sizes, 
+            color: colors,
             price, 
             currency, 
             stock, 
             images, 
             materials, 
             features, 
-            rating,
             category 
         } = req.body;
 
@@ -65,16 +64,11 @@ export const uploadProducts = async (req, res) => {
             return res.status(400).send({ error: "features must be an array of strings" });
         }
 
-        if (rating && (typeof rating !== 'object' || typeof rating.average !== 'number' || typeof rating.count !== 'number')) {
-            return res.status(400).send({ error: "rating must be an object with numeric average and count" });
-        }
-
         if (percentOff && (typeof percentOff !== 'number' || percentOff < 0 || percentOff > 100)) {
             return res.status(400).send({ error: "percentOff must be a number between 0 and 100" });
         }
 
         let checkCategory = await Category.findOne({ name: category });
-
         if (!checkCategory) {
             checkCategory = new Category({ name: category });
             await checkCategory.save();
@@ -93,7 +87,6 @@ export const uploadProducts = async (req, res) => {
             images, 
             materials, 
             features, 
-            rating,
             categoryId: checkCategory._id
         });
 

@@ -1,10 +1,10 @@
 import Cart from "../../../models/carts.mjs";
 import Product from "../../../models/products.mjs";
-
 export const addToCart = async (req, res) => {
     try {
         const user = req.user;
         const { productId, size, color, quantity } = req.body;
+        
         
         if (!productId || !quantity) {
             return res.status(400).send({ error: "productId and quantity are required" });
@@ -30,7 +30,8 @@ export const addToCart = async (req, res) => {
             return res.status(400).send({error: "color must be a string"})
         }
 
-        let cart = await Cart.findOne({ userId: user });
+        let cart = await Cart.findOne({ userId: user }).populate('items.productId');
+        console.log(cart)
         if (!cart) {
             cart = new Cart({
                 userId: user,
@@ -52,7 +53,7 @@ export const addToCart = async (req, res) => {
             cart.items.push({
                 productId,
                 size,
-                color,
+                color,  
                 quantity,
                 price: product.price
             });
@@ -62,7 +63,9 @@ export const addToCart = async (req, res) => {
 
         await cart.save();
 
-        res.status(200).send({ message: "Product added to cart successfully", cart });
+        let cartResponse = await Cart.findOne({ userId: user }).populate('items.productId');
+
+        res.status(200).send({ message: "Product added to cart successfully", cart: cartResponse });
     } catch (err) {
         console.error(err);
         return res.status(500).send({ error: "Server error, please contact support" });

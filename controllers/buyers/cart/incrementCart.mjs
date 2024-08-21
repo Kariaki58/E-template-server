@@ -6,7 +6,8 @@ export const incrementCart = async (req, res) => {
 
     const user = req.user
 
-    if (!productId || !quantity || !pos) {
+    if (!productId || !quantity || pos === undefined) {
+        console.log("failed checking")
         return res.status(400).send({ error: "productId, pos and quantity are required" });
     }
 
@@ -14,7 +15,7 @@ export const incrementCart = async (req, res) => {
         return res.status(401).send({ error: "You are not logged in" });
     }
 
-    let cart = await Cart.findOne({ userId: user });
+    let cart = await Cart.findOne({ userId: user }).populate('items.productId');
 
     if (!cart) {
         return res.status(400).send({ error: "item not present in your cart"})
@@ -32,10 +33,11 @@ export const incrementCart = async (req, res) => {
     if (pos > -1) {
         cart.items[pos].quantity += quantity;
         cart.items[pos].price = product.price;
+    } else {
+        return res.status(400).send({ error: "invalid position"})
     }
-
+    
     cart.totalPrice = cart.items.reduce((total, item) => total + item.price * item.quantity, 0);
-
     await cart.save();
 
     return res.status(200).send({ message: "quantity updated successfully", cart });

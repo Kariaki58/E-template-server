@@ -5,7 +5,6 @@ import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
 import dotenv from 'dotenv'
 import ExpressMongoSanitize from 'express-mongo-sanitize'
-import { authenticateToken } from './middleware/auth.mjs'
 
 dotenv.config()
 

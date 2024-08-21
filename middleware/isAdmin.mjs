@@ -7,7 +7,6 @@ export const isAdmin = async (req, res, next) => {
     if (!user) {
         return res.status(400).send({message: "you are not loged in"})
     }
-    console.log(user)
     const verifyAdmin = await User.findOne({ _id: user }).select('-password')
     if (!verifyAdmin || !verifyAdmin.isAdmin) {
         return res.status(400).send({message: "unauthorize opperation"})

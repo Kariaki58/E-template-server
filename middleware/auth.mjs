@@ -6,7 +6,7 @@ export const generateToken = (_id) => {
 };
 
 export const authenticateToken = (req, res, next) => {
-    const token = req.cookies.token
+    const token = req.cookies.token || req.cookies._auth
     if (!token) {
         return res.sendStatus(401)
     }
@@ -15,7 +15,6 @@ export const authenticateToken = (req, res, next) => {
         if (err) {
             return res.sendStatus(403)
         }
-        console.log(user)
         req.user = user._id
         next()
     })

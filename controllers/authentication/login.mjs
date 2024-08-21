@@ -16,10 +16,12 @@ export const login = async (req, res) => {
     }
 
     const token = generateToken(user._id);
+
+    const isAdmin = user.isAdmin
     res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         maxAge: 3600000
     });
-    return res.json({ message: 'User login successfully', token });
+    return res.json({ message: 'User login successfully', token, isAdmin });
 }
