@@ -89,7 +89,6 @@ export const editProduct = async (req, res) => {
 
         res.status(200).send({ message: "Product updated successfully", product: updatedProduct });
     } catch (err) {
-        console.error(err);
         return res.status(500).send({ error: "Server error, please contact staff" });
     }
 };

@@ -17,13 +17,20 @@ import { decrementCart } from "../controllers/buyers/cart/decrementCart.mjs";
 import { editCart } from "../controllers/buyers/cart/editCart.mjs";
 import { addAddress } from "../controllers/buyers/address/address.mjs";
 import { addOrder } from "../controllers/buyers/orders/addOrder.mjs";
-import { getOrders } from "../controllers/buyers/orders/getOrders.mjs";
 import { getProductReview } from "../controllers/buyers/reviews/getReview.mjs";
 import { addReview } from "../controllers/buyers/reviews/addReview.mjs";
 import { editReview } from "../controllers/buyers/reviews/editReview.mjs";
 import { removeReview } from "../controllers/buyers/reviews/removeReview.mjs";
 import { category } from "../controllers/category.mjs";
 import { generateSignature } from "../utils/cloudinary.mjs";
+import { productPage } from "../controllers/productPage.mjs";
+import { getAddress } from "../controllers/getAddress.mjs";
+import { payment } from "../controllers/buyers/payment/payment.mjs";
+import { addTransaction } from '../controllers/sellers/transactions.mjs';
+import { getUserOrders, getAllOrders } from "../controllers/buyers/orders/addOrder.mjs";
+import { getUserTransactions, getAllTransactions } from "../controllers/sellers/transactions.mjs";
+import { modifyOrderStatus } from "../controllers/sellers/modifyOrderStatus.mjs";
+import { getUserAddress } from "../controllers/buyers/orders/addOrder.mjs";
 
 
 const route = Router()
@@ -48,14 +55,26 @@ route.put('/cart/edit', authenticateToken, editCart)
 route.patch('/cart/increment', authenticateToken, incrementCart)
 route.patch('/cart/decrement', authenticateToken, decrementCart)
 route.delete('/delete/cart/:pos/:cid', authenticateToken, removeFromCart)
-route.post('/address/add', authenticateToken, addAddress)
-route.post('/order/add', authenticateToken, addOrder)
-route.get('/order/get', authenticateToken, getOrders)
+route.post('/address/add', addAddress)
+route.get('/address', authenticateToken, getAddress)
 route.get('/category/get', category)
-route.get('/review/get', getProductReview)
-route.post('/review/add', addReview)
-route.put('/review/edit', editReview)
-route.delete('/review/delete', removeReview)
+route.get('/review/get/:pid', getProductReview)
+route.post('/review/add', authenticateToken, addReview)
+route.put('/review/edit', authenticateToken, editReview)
+route.delete('/review/delete', authenticateToken, removeReview)
 route.post('/api/gensignature', authenticateToken, isAdmin, generateSignature)
+route.post('/payment/transaction', authenticateToken, isAdmin, addTransaction)
+route.get('/products/:id', productPage)
+route.post('/transaction/initialize', payment)
+
+route.post('/order', authenticateToken, addOrder);
+route.get('/order/user', authenticateToken, getUserOrders);
+route.get('/order/admin', authenticateToken, isAdmin, getAllOrders);
+route.get('/user/address/:userId', getUserAddress);
+route.patch('/order/admin/:orderId', authenticateToken, isAdmin, modifyOrderStatus)
+
+route.post('/transaction', authenticateToken, addTransaction);
+route.get('/transaction/user', authenticateToken, getUserTransactions);
+route.get('/transaction/admin', authenticateToken, isAdmin, getAllTransactions);
 
 export default route

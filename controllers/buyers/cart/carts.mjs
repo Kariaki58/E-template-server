@@ -10,7 +10,6 @@ export const getUserCart = async (req, res) => {
         }
         return res.status(200).send({ message: findUserCart })
     } catch (err) {
-        console.log(err)
         return res.status(500).send({ error: "server error" })
     }
 }

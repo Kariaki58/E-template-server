@@ -1,16 +1,12 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
+const transactionSchema = new mongoose.Schema({
+  orderId: { type: mongoose.Schema.ObjectId, ref: 'Order', required: true },
+  userId: { type: mongoose.Schema.ObjectId, ref: 'User', required: true },
+  reference: { type: String, required: true },
+  status: { type: String, required: true },
+  amount: { type: Number, required: true },
+}, { timestamps: true });
 
-const transaction = mongoose.Schema({
-    orderId: mongoose.Schema.ObjectId,
-    userId: mongoose.Schema.ObjectId,
-    amount: Number,
-    currency: String,
-    paymentMethod: String,
-    transactionStatus: String,
-    transactionDate: Date
-}, { timestamps: true })
-
-const Transaction = mongoose.model('Trasaction', transaction);
-
-export default Transaction
+const Transaction = mongoose.model('Transaction', transactionSchema);
+export default Transaction;

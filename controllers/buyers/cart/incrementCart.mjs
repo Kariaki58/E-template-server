@@ -5,9 +5,8 @@ export const incrementCart = async (req, res) => {
     const { body: { productId, quantity, pos } } = req
 
     const user = req.user
-
+    
     if (!productId || !quantity || pos === undefined) {
-        console.log("failed checking")
         return res.status(400).send({ error: "productId, pos and quantity are required" });
     }
 
@@ -28,7 +27,6 @@ export const incrementCart = async (req, res) => {
     if (typeof quantity !== 'number' || quantity <= 0) {
         return res.status(400).send({ error: "Quantity must be a positive number" });
     }
-
 
     if (pos > -1) {
         cart.items[pos].quantity += quantity;

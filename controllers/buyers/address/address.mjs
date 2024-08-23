@@ -1,47 +1,54 @@
 import Address from "../../../models/address.mjs";
+import jwt from 'jsonwebtoken'
 
 export const addAddress = async (req, res) => {
-    const user = req.user;
+    const { address, name, email, city, state, zip: zipCode, country, phone: phoneNumber } = req.body;
+    const token = req.cookies.token || req.cookies._auth
+    
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        req.user = user._id
+    })
 
-    const { street, city, state, zipCode, country, phoneNumber } = req.body;
-
-    if (!street || !city || !state || !country || !phoneNumber) {
+    const user = req.user
+    if (!address || !city || !state || !country || !phoneNumber || !email || !name) {
         return res.status(400).json({ error: "All required fields must be provided." });
     }
-    if (typeof street !== 'string' || typeof city !== 'string' || typeof state !== 'string' || typeof country !== 'string' || 
-        typeof phoneNumber !== 'string' 
-    ) {
-        return res.status(400).send({error: "error account"})
+
+    if (typeof address !== 'string' || typeof city !== 'string' || typeof state !== 'string' || 
+        typeof country !== 'string' || typeof phoneNumber !== 'string' || typeof email !== 'string' || 
+        typeof name !== 'string') {
+        return res.status(400).json({ error: "Invalid input types provided." });
     }
-
-    let findAddress = await Address.findOne({ userId: user })
-
-    if (findAddress) {
-        findAddress.street = street
-        findAddress.city = city
-        findAddress.state = state
-        findAddress.zipCode = zipCode
-        findAddress.phoneNumber = phoneNumber
-        findAddress.country = country
-    } else {
-
-        findAddress = new Address({
-            userId: user,
-            street,
-            city,
-            state,
-            zipCode,
-            country,
-            phoneNumber,
-        });
-    }
-
 
     try {
-        const savedAddress = await findAddress.save();
+        let findAddress = await Address.findOne({ userId: user });
+        if (findAddress) {
+            findAddress.userId = user,
+            findAddress.address = address;
+            findAddress.city = city;
+            findAddress.state = state;
+            findAddress.zipCode = zipCode;
+            findAddress.country = country;
+            findAddress.phoneNumber = phoneNumber;
+            findAddress.email = email;
+            findAddress.name = name;
+        } else {
+            findAddress = new Address({
+                userId: user,
+                address,
+                city,
+                state,
+                zipCode,
+                country,
+                phoneNumber,
+                email,
+                name
+            });
+        }
 
-        res.status(201).json(savedAddress);
+        const savedAddress = await findAddress.save();
+        res.status(201).send({ address: savedAddress });
     } catch (error) {
-        res.status(500).json({ error: "Failed to save address"});
+        res.status(500).json({ error: "Failed to save address." });
     }
 };

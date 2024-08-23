@@ -3,14 +3,17 @@ import mongoose from "mongoose";
 
 const address = mongoose.Schema({
     userId: {
-        type: mongoose.Schema.ObjectId,
-        required: true
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
     },
-    street: {
+    name: {
+        type: String
+    },
+    city: {
         type: String,
         required: true
     },
-    city: {
+    address: {
         type: String,
         required: true
     },
@@ -26,6 +29,10 @@ const address = mongoose.Schema({
         required: true
     },
     phoneNumber: {
+        type: String,
+        required: true
+    },
+    email: {
         type: String,
         required: true
     }

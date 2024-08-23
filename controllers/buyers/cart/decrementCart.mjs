@@ -3,7 +3,6 @@ import Product from "../../../models/products.mjs";
 
 export const decrementCart = async (req, res) => {
     const { body: { productId, quantity, pos } } = req
-    console.log(productId, quantity, pos)
     const user = req.user
 
     if (!productId || !quantity || pos === undefined) {
@@ -35,7 +34,6 @@ export const decrementCart = async (req, res) => {
     } else {
         return res.status(400).send({ error: "invalid position"})
     }
-    console.log("here")
     cart.totalPrice = cart.items.reduce((total, item) => total + item.price * item.quantity, 0);
     await cart.save();
 

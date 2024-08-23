@@ -16,7 +16,6 @@ export const deleteProduct = async (req, res) => {
 
         res.status(200).send({ message: "Product deleted successfully" });
     } catch (err) {
-        console.error(err);
         return res.status(500).send({ error: "Server error, please contact staff" });
     }
 };

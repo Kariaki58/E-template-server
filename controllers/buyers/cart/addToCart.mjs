@@ -1,11 +1,11 @@
 import Cart from "../../../models/carts.mjs";
 import Product from "../../../models/products.mjs";
+
 export const addToCart = async (req, res) => {
     try {
         const user = req.user;
         const { productId, size, color, quantity } = req.body;
-        
-        
+
         if (!productId || !quantity) {
             return res.status(400).send({ error: "productId and quantity are required" });
         }
@@ -24,14 +24,14 @@ export const addToCart = async (req, res) => {
         }
 
         if (size && typeof size !== 'string') {
-            return res.status(400).send({error: "size must be a string"})
+            return res.status(400).send({error: "Size must be a string"});
         }
         if (color && typeof color !== "string") {
-            return res.status(400).send({error: "color must be a string"})
+            return res.status(400).send({error: "Color must be a string"});
         }
 
         let cart = await Cart.findOne({ userId: user }).populate('items.productId');
-        console.log(cart)
+        
         if (!cart) {
             cart = new Cart({
                 userId: user,
@@ -40,10 +40,11 @@ export const addToCart = async (req, res) => {
             });
         }
 
-        const existingItemIndex = cart.items.findIndex(item => 
-            item.productId.toString() === productId &&
-            item.size === size &&
-            item.color === color
+        const existingItemIndex = cart.items.findIndex(item => {
+            return item.productId._id.toString() === productId &&
+            (!size || item.size === size) &&
+            (!color || item.color === color)
+            }
         );
 
         if (existingItemIndex > -1) {
@@ -67,7 +68,6 @@ export const addToCart = async (req, res) => {
 
         res.status(200).send({ message: "Product added to cart successfully", cart: cartResponse });
     } catch (err) {
-        console.error(err);
         return res.status(500).send({ error: "Server error, please contact support" });
     }
 };
