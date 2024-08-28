@@ -5,8 +5,6 @@ import { login } from "../controllers/authentication/login.mjs";
 import { authenticateToken } from "../middleware/auth.mjs";
 import {uploadProducts} from '../controllers/sellers/upload-products.mjs'
 import { isAdmin } from "../middleware/isAdmin.mjs";
-import { editProduct } from "../controllers/sellers/editProduct.mjs";
-import { deleteProduct } from '../controllers/sellers/deleteProduct.mjs';
 import { signout } from "../controllers/authentication/signout.mjs";
 import { getUploads } from "../controllers/sellers/getUploads.mjs";
 import { addToCart } from "../controllers/buyers/cart/addToCart.mjs";
@@ -21,7 +19,6 @@ import { getProductReview } from "../controllers/buyers/reviews/getReview.mjs";
 import { addReview } from "../controllers/buyers/reviews/addReview.mjs";
 import { editReview } from "../controllers/buyers/reviews/editReview.mjs";
 import { removeReview } from "../controllers/buyers/reviews/removeReview.mjs";
-import { category } from "../controllers/category.mjs";
 import { generateSignature } from "../utils/cloudinary.mjs";
 import { productPage } from "../controllers/productPage.mjs";
 import { getAddress } from "../controllers/getAddress.mjs";
@@ -31,6 +28,12 @@ import { getUserOrders, getAllOrders } from "../controllers/buyers/orders/addOrd
 import { getUserTransactions, getAllTransactions } from "../controllers/sellers/transactions.mjs";
 import { modifyOrderStatus } from "../controllers/sellers/modifyOrderStatus.mjs";
 import { getUserAddress } from "../controllers/buyers/orders/addOrder.mjs";
+import { getUserEmails } from '../controllers/sellers/getUserEmails.mjs'
+import { getAllProducts, deleteProduct } from "../controllers/sellers/deleteProduct.mjs";
+import { editProduct } from "../controllers/sellers/editProduct.mjs";
+import { nonAuthOrder } from "../controllers/buyers/orders/nonAuthOrder.mjs";
+import { clearCart } from "../controllers/buyers/cart/clearCart.mjs";
+import { Analytics } from "../controllers/sellers/Analytics.mjs";
 
 
 const route = Router()
@@ -44,10 +47,11 @@ route.get('/protected', authenticateToken, (req, res) => {
     res.json({ message: 'This is a protected route', user:req.user })
 })
 
-route.get('/upload/product', getUploads)
+route.get('/upload/products', getUploads)
+route.get('/admin/products', authenticateToken, isAdmin, getAllProducts)
+route.put('/admin/product/edit', authenticateToken, isAdmin, editProduct);
+route.delete('/admin/product/:productId', authenticateToken, isAdmin, deleteProduct);
 route.post('/upload/add', authenticateToken, isAdmin, uploadProducts)
-route.put('/upload/edit', authenticateToken, isAdmin, editProduct)
-route.delete('/upload/delete', authenticateToken, isAdmin, deleteProduct);
 
 route.get('/cart', authenticateToken, getUserCart)
 route.post('/cart/add', authenticateToken, addToCart)
@@ -57,7 +61,6 @@ route.patch('/cart/decrement', authenticateToken, decrementCart)
 route.delete('/delete/cart/:pos/:cid', authenticateToken, removeFromCart)
 route.post('/address/add', addAddress)
 route.get('/address', authenticateToken, getAddress)
-route.get('/category/get', category)
 route.get('/review/get/:pid', getProductReview)
 route.post('/review/add', authenticateToken, addReview)
 route.put('/review/edit', authenticateToken, editReview)
@@ -66,15 +69,20 @@ route.post('/api/gensignature', authenticateToken, isAdmin, generateSignature)
 route.post('/payment/transaction', authenticateToken, isAdmin, addTransaction)
 route.get('/products/:id', productPage)
 route.post('/transaction/initialize', payment)
+route.post('/order/place', nonAuthOrder)
 
 route.post('/order', authenticateToken, addOrder);
 route.get('/order/user', authenticateToken, getUserOrders);
 route.get('/order/admin', authenticateToken, isAdmin, getAllOrders);
-route.get('/user/address/:userId', getUserAddress);
+route.get('/user/address/:orderId', getUserAddress);
 route.patch('/order/admin/:orderId', authenticateToken, isAdmin, modifyOrderStatus)
+route.delete('/cart/:id', authenticateToken, clearCart)
 
 route.post('/transaction', authenticateToken, addTransaction);
 route.get('/transaction/user', authenticateToken, getUserTransactions);
 route.get('/transaction/admin', authenticateToken, isAdmin, getAllTransactions);
+route.get('/admin/email', authenticateToken, isAdmin, getUserEmails)
+
+route.get('/api/orders/analytics', authenticateToken, isAdmin, Analytics)
 
 export default route

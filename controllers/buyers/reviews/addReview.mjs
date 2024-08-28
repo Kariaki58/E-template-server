@@ -3,7 +3,6 @@ import Review from "../../../models/reviews.mjs"
 
 export const addReview = async (req, res) => {
     const { body: { productId, rating, comment, imageUrl: reviewImage }} = req
-
     const user = req.user
 
     const checkUserReview = await Review.findOne({ userId: user, productId })

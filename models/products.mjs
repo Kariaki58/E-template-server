@@ -11,9 +11,8 @@ const productSchema = new Schema({
         type: String,
         required: true
     },
-    categoryId: {
-        type: Types.ObjectId,
-        ref: 'Category',
+    category: {
+        type: String,
         required: true
     },
     gender: String,
@@ -31,20 +30,11 @@ const productSchema = new Schema({
         required: true,
         min: 0
     },
-    currency: {
-        type: String,
-        default: 'USD'
-    },
     stock: {
         type: Number,
         required: true,
         min: 0
     },
-    // sku: {
-    //     type: String,
-    //     unique: true,
-    //     default: null
-    // },
     images: {
         type: [String],
         required: true

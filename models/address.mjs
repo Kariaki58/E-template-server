@@ -7,7 +7,8 @@ const address = mongoose.Schema({
         ref: 'User'
     },
     name: {
-        type: String
+        type: String,
+        required: true
     },
     city: {
         type: String,

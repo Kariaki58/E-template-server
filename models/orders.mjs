@@ -4,21 +4,26 @@ const { Schema, model } = mongoose;
 
 const orderSchema = new Schema({
   userId: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   },
-  cartId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Cart',
-    required: true
+  color: {
+    type: String
+  },
+  size: {
+    type: String
+  },
+  quantity: {
+    type: Number,
+    required: true,
+    min: 1
   },
   shippingAddress: {
     type: Schema.Types.ObjectId,
     ref: 'Address',
     required: true
   },
-  totalAmount: {
+  price: {
     type: Number,
     required: true,
     min: 0

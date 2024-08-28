@@ -1,5 +1,4 @@
 import Product from "../../models/products.mjs";
-import Category from "../../models/categories.mjs";
 
 
 export const uploadProducts = async (req, res) => {
@@ -12,7 +11,6 @@ export const uploadProducts = async (req, res) => {
             size: sizes, 
             color: colors,
             price, 
-            currency, 
             stock, 
             images, 
             materials, 
@@ -20,6 +18,7 @@ export const uploadProducts = async (req, res) => {
             category 
         } = req.body;
 
+        
         if (!name || !description || !price || !stock || !images || !category || images.length === 0) {
             return res.status(400).send({ error: "name, description, price, stock, images, and category are required" });
         }
@@ -46,9 +45,6 @@ export const uploadProducts = async (req, res) => {
         if (gender && typeof gender !== 'string') {
             return res.status(400).send({ error: "gender must be a string" })
         }
-        if (currency && typeof currency !== "string") {
-            return res.status(400).send({ error: "currency must be a string" })
-        }
         if (sizes && (!Array.isArray(sizes) || sizes.some(size => typeof size !== 'string'))) {
             return res.status(400).send({ error: "sizes must be an array of strings" });
         }
@@ -68,12 +64,7 @@ export const uploadProducts = async (req, res) => {
             return res.status(400).send({ error: "percentOff must be a number between 0 and 100" });
         }
 
-        let checkCategory = await Category.findOne({ name: category });
-        if (!checkCategory) {
-            checkCategory = new Category({ name: category });
-            await checkCategory.save();
-        }
-
+       
         const product = new Product({
             name, 
             description, 
@@ -82,12 +73,11 @@ export const uploadProducts = async (req, res) => {
             sizes, 
             colors,
             price, 
-            currency, 
             stock, 
             images, 
             materials, 
-            features, 
-            categoryId: checkCategory._id
+            features,
+            category
         });
 
         await product.save();

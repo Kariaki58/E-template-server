@@ -1,6 +1,7 @@
 import User from "../../models/users.mjs"
 import bcrypt from 'bcryptjs'
 import { generateToken } from "../../middleware/auth.mjs"
+import Email from "../../models/emailList.mjs"
 
 
 export const register = async (req, res) => {
@@ -12,8 +13,10 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10)
     
     const newUser = new User({ email, password: hashedPassword })
+    const saveUserEmail = new Email({ email })
 
     await newUser.save()
+    await saveUserEmail.save()
     const token = generateToken(newUser._id)
     res.cookie('token', token, {
         httpOnly: true,
