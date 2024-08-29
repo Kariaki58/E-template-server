@@ -39,8 +39,8 @@ import { Subscriber } from "../controllers/Subscriber.mjs";
 
 const route = Router()
 
+route.get('/', getUploads)
 
-route.get("/", home)
 route.post('/register', register)
 route.post('/login', login)
 route.post('/signout', signout)
@@ -48,7 +48,6 @@ route.get('/protected', authenticateToken, (req, res) => {
     res.json({ message: 'This is a protected route', user:req.user })
 })
 
-route.get('/upload/products', getUploads)
 route.get('/admin/products', authenticateToken, isAdmin, getAllProducts)
 route.put('/admin/product/edit', authenticateToken, isAdmin, editProduct);
 route.delete('/admin/product/:productId', authenticateToken, isAdmin, deleteProduct);
