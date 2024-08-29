@@ -34,6 +34,7 @@ import { editProduct } from "../controllers/sellers/editProduct.mjs";
 import { nonAuthOrder } from "../controllers/buyers/orders/nonAuthOrder.mjs";
 import { clearCart } from "../controllers/buyers/cart/clearCart.mjs";
 import { Analytics } from "../controllers/sellers/Analytics.mjs";
+import { Subscriber } from "../controllers/Subscriber.mjs";
 
 
 const route = Router()
@@ -84,5 +85,6 @@ route.get('/transaction/admin', authenticateToken, isAdmin, getAllTransactions);
 route.get('/admin/email', authenticateToken, isAdmin, getUserEmails)
 
 route.get('/api/orders/analytics', authenticateToken, isAdmin, Analytics)
+route.post('/make-admin', authenticateToken, Subscriber)
 
 export default route

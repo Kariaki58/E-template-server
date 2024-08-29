@@ -5,7 +5,7 @@ import Cart from "../../../models/carts.mjs";
 
 export const addOrder = async (req, res) => {
   const { user: userId, body: { cartId, status, shippingDetails:shippingAddress } } = req;
-  
+
   
   try {
     let findAddress = await Address.findOne({ userId });
