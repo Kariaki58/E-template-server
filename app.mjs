@@ -11,8 +11,9 @@ dotenv.config()
 const app = express()
 app.use(express.json())
 
+// [process.env.FRONTEND || "https://kariaki.vercel.app", "http://localhost:5173"]
 const corsOptions = {
-    origin: [process.env.FRONTEND || "https://kariaki.vercel.app", "http://localhost:5173"],
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true
 }
