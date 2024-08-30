@@ -12,7 +12,7 @@ const app = express()
 app.use(express.json())
 
 const corsOptions = {
-    origin: process.env.FRONTEND || "https://kariaki.vercel.app",
+    origin: [process.env.FRONTEND || "https://kariaki.vercel.app", "http://localhost:5173"],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true
 }

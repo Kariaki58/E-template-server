@@ -44,9 +44,6 @@ route.get('/', getUploads)
 route.post('/register', register)
 route.post('/login', login)
 route.post('/signout', signout)
-route.get('/protected', authenticateToken, (req, res) => {
-    res.json({ message: 'This is a protected route', user:req.user })
-})
 
 route.get('/admin/products', authenticateToken, isAdmin, getAllProducts)
 route.put('/admin/product/edit', authenticateToken, isAdmin, editProduct);
