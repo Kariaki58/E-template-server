@@ -13,7 +13,7 @@ app.use(express.json())
 
 // [process.env.FRONTEND || "https://kariaki.vercel.app", "http://localhost:5173"]
 
-const allowedOrigins = ['https://kariaki.vercel.app', 'http://localhost:5173/'];
+const allowedOrigins = 'http://localhost:5173';
 
 const corsOptions = {
     origin: allowedOrigins,
@@ -25,7 +25,7 @@ const corsOptions = {
 app.use(cors(corsOptions))
 
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND || "https://kariaki.vercel.app");
+    res.header("Access-Control-Allow-Origin", allowedOrigins);
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     next();
@@ -38,6 +38,7 @@ app.use(route)
 mongoose.connect(process.env.CONNECT_MONGO)
 .then(() => {
     app.listen(process.env.PORT, () => {
+        console.log("runing on port", process.env.PORT)
     })
 })
 

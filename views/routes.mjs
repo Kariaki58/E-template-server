@@ -22,7 +22,6 @@ import { removeReview } from "../controllers/buyers/reviews/removeReview.mjs";
 import { generateSignature } from "../utils/cloudinary.mjs";
 import { productPage } from "../controllers/productPage.mjs";
 import { getAddress } from "../controllers/getAddress.mjs";
-import { payment } from "../controllers/buyers/payment/payment.mjs";
 import { addTransaction } from '../controllers/sellers/transactions.mjs';
 import { getUserOrders, getAllOrders } from "../controllers/buyers/orders/addOrder.mjs";
 import { getUserTransactions, getAllTransactions } from "../controllers/sellers/transactions.mjs";
@@ -63,9 +62,7 @@ route.post('/review/add', authenticateToken, addReview)
 route.put('/review/edit', authenticateToken, editReview)
 route.delete('/review/delete', authenticateToken, removeReview)
 route.post('/api/gensignature', authenticateToken, isAdmin, generateSignature)
-route.post('/payment/transaction', authenticateToken, isAdmin, addTransaction)
 route.get('/products/:id', productPage)
-route.post('/transaction/initialize', payment)
 route.post('/order/place', nonAuthOrder)
 
 route.post('/order', authenticateToken, addOrder);
