@@ -13,7 +13,7 @@ app.use(express.json())
 
 // [process.env.FRONTEND || "https://kariaki.vercel.app", "http://localhost:5173"]
 
-const allowedOrigins = 'http://localhost:5173';
+const allowedOrigins = 'https://kariaki.vercel.app';
 
 const corsOptions = {
     origin: allowedOrigins,
