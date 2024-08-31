@@ -2,7 +2,7 @@ import User from "../models/users.mjs"
 import Transaction from '../models/transactions.mjs'
 import { createTransport } from 'nodemailer'
 
-export const sendEmail = (email) => {
+export const sendEmail = (email, subject, receiver, template) => {
     const transporter = createTransport({
         service: process.env.SERVICE,
         auth: {
@@ -11,17 +11,11 @@ export const sendEmail = (email) => {
         }
     })
 
-
     let mailOptions = {
         from: email,
-        to: process.env.ADDRESS,
-        subject: 'Web Customization Request',
-        html: `
-        <h1>Web Customization Paid Request</h1>
-        <p>you are given a task to create a website on the ${new Date()}</p>
-        <p>the email of the person is</p>
-        <h1>${email}</h1>
-        `
+        to: receiver,
+        subject,
+        html: template
     };
     transporter.sendMail(mailOptions, async (error, info) => {
         if (error) {
@@ -30,6 +24,7 @@ export const sendEmail = (email) => {
     });
     return null
 }
+
 export const Subscriber = async (req, res) => {
     let data = req.body
     const user = req.user
@@ -53,12 +48,18 @@ export const Subscriber = async (req, res) => {
 
         transaction.save()
 
-        const returedValue = sendEmail(data.email)
+        const template = `
+        <h1>Web Customization Paid Request</h1>
+        <p>you are given a task to create a website on the ${new Date()}</p>
+        <p>the email of the person is</p>
+        <h1>${email}</h1>
+        `
+
+        const returedValue = sendEmail(data.email, 'Web Customization Request', process.env.ADDRESS, template)
         if (returedValue) {
             return res.status(500).send(returedValue)
         }
         if (isThereAdmin) {
-            //automate github, vercel, and deployment
             return res.status(200).send({ message: "Payment received. We'll get back to you within 24 hours" })
         }
     
