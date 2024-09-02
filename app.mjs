@@ -21,7 +21,7 @@ app.use(compression());  // Compress responses
 app.use(helmet());  // Set security-related HTTP response headers
 
 // CORS configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS || 'http://localhost:5173';
+const allowedOrigins = process.env.FRONTEND;
 const corsOptions = {
   origin: allowedOrigins.split(','),
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
@@ -29,18 +29,18 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// const limiter = rateLimit({
-//     windowMs: 15 * 60 * 1000, // 15 minutes
-//     max: 100, // Limit each IP to 100 requests per windowMs
-//     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-//     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-//     handler: (req, res, next) => {
-//       return res.status(429).json({
-//         message: "Too many requests, please try again later."
-//       });
-//     }
-// });
-// app.use(limiter);
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    handler: (req, res, next) => {
+      return res.status(429).json({
+        message: "Too many requests, please try again later."
+      });
+    }
+});
+app.use(limiter);
 
 // Prevent XSS attacks
 app.use((req, res, next) => {
@@ -59,16 +59,11 @@ app.use(routes);
 // Connect to MongoDB and start server
 mongoose
   .connect(process.env.CONNECT_MONGO, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
   })
   .then(() => {
-    app.listen(process.env.PORT, () => {
-      console.log(`Server running on port ${process.env.PORT}`);
-    });
+    app.listen(process.env.PORT, () => {});
   })
   .catch(err => {
-    console.error('Failed to connect to MongoDB', err);
   });
 
 export default app;

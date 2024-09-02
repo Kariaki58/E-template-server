@@ -5,7 +5,6 @@ export const productPage = async (req, res) => {
     try {
         const { id } = req.params;
 
-        console.log(id)
 
         // Validate the ObjectId format
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -20,7 +19,6 @@ export const productPage = async (req, res) => {
             return res.status(404).send({ error: "Product not found" });
         }
 
-        console.log(product)
 
         // Return the product information
         return res.status(200).send({ product });
