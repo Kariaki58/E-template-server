@@ -23,7 +23,7 @@ app.use(helmet());  // Set security-related HTTP response headers
 // CORS configuration
 const allowedOrigins = process.env.FRONTEND;
 const corsOptions = {
-  origin: allowedOrigins.split(','),
+  origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   credentials: true,
 };
