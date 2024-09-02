@@ -1,17 +1,35 @@
 import Product from "../models/products.mjs";
+import mongoose from 'mongoose';
 
 export const productPage = async (req, res) => {
     try {
-        const  { id } = req.params
+        const { id } = req.params;
 
-        if (!id) {
-            return res.status(400).send({ error: "product id is required" })
+        console.log(id)
+
+        // Validate the ObjectId format
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({ error: "Invalid product ID format" });
         }
-        
+
+        // Fetch the product by ID
         const product = await Product.findById(id);
-        if (!product) return res.status(404).send({ error: 'Product not found' });
-        return res.status(200).send({ message: product });
+
+        // Handle case where product is not found
+        if (!product) {
+            return res.status(404).send({ error: "Product not found" });
+        }
+
+        console.log(product)
+
+        // Return the product information
+        return res.status(200).send({ product });
+        
     } catch (error) {
-        res.status(500).send({ error: 'Server error' });
+        // Log the error for debugging
+        console.error('Error fetching product:', error);
+
+        // Return a generic server error message
+        return res.status(500).send({ error: "Server error, please try again later" });
     }
-}
+};

@@ -1,10 +1,16 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
+const { Schema, model } = mongoose;
 
-const user = mongoose.Schema({
+// User Schema definition
+const userSchema = new Schema({
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true, // Ensure email is unique
+        trim: true, // Remove leading and trailing spaces
+        lowercase: true, // Store emails in lowercase for consistency
+        match: [/.+@.+\..+/, 'Please enter a valid email address'] // Email format validation
     },
     password: {
         type: String,
@@ -14,9 +20,11 @@ const user = mongoose.Schema({
         type: Boolean,
         default: false
     }
-}, { timestamps: true })
+}, { timestamps: true });
 
+// Create index for email
+userSchema.index({ email: 1 });
 
-const User = mongoose.model('User', user)
+const User = model('User', userSchema);
 
-export default User
+export default User;

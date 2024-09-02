@@ -1,89 +1,96 @@
 import Product from "../../models/products.mjs";
 
+// Utility function to validate arrays
+const validateArray = (arr, type) => 
+  Array.isArray(arr) && arr.every(item => typeof item === type);
 
 export const uploadProducts = async (req, res) => {
-    try {
-        const { 
-            productName: name, 
-            description, 
-            gender, 
-            percentOff, 
-            size: sizes, 
-            color: colors,
-            price, 
-            stock, 
-            images, 
-            materials, 
-            features, 
-            category 
-        } = req.body;
+  const {
+    productName: name,
+    description,
+    gender,
+    percentOff,
+    size: sizes,
+    color: colors,
+    price,
+    stock,
+    images,
+    materials,
+    features,
+    category
+  } = req.body;
 
-        
-        if (!name || !description || !price || !stock || !images || !category || images.length === 0) {
-            return res.status(400).send({ error: "name, description, price, stock, images, and category are required" });
-        }
-
-        if (typeof name !== 'string' || typeof description !== 'string') {
-            return res.status(400).send({ error: "name and description must be strings" });
-        }
-
-        if (typeof price !== 'number' || price <= 0) {
-            return res.status(400).send({ error: "price must be a positive number" });
-        }
-
-        if (typeof stock !== 'number' || stock < 0) {
-            return res.status(400).send({ error: "stock must be a non-negative number" });
-        }
-
-        if (!Array.isArray(images) || images.some(img => typeof img !== 'string')) {
-            return res.status(400).send({ error: "images must be an array of strings" });
-        }
-
-        if (typeof category !== 'string') {
-            return res.status(400).send({ error: "category must be a string" });
-        }
-        if (gender && typeof gender !== 'string') {
-            return res.status(400).send({ error: "gender must be a string" })
-        }
-        if (sizes && (!Array.isArray(sizes) || sizes.some(size => typeof size !== 'string'))) {
-            return res.status(400).send({ error: "sizes must be an array of strings" });
-        }
-
-        if (colors && (!Array.isArray(colors) || colors.some(color => typeof color !== 'string'))) {
-            return res.status(400).send({ error: "colors must be an array of strings" });
-        }
-        if (materials && (!Array.isArray(materials) || materials.some(material => typeof material !== 'string'))) {
-            return res.status(400).send({ error: "materials must be an array of strings" });
-        }
-
-        if (features && (!Array.isArray(features) || features.some(feature => typeof feature !== 'string'))) {
-            return res.status(400).send({ error: "features must be an array of strings" });
-        }
-
-        if (percentOff && (typeof percentOff !== 'number' || percentOff < 0 || percentOff > 100)) {
-            return res.status(400).send({ error: "percentOff must be a number between 0 and 100" });
-        }
-
-       
-        const product = new Product({
-            name, 
-            description, 
-            gender, 
-            percentOff, 
-            sizes, 
-            colors,
-            price, 
-            stock, 
-            images, 
-            materials, 
-            features,
-            category
-        });
-
-        await product.save();
-
-        res.status(201).send({ message: "Product uploaded successfully", product });
-    } catch (err) {
-        return res.status(500).send({ error: "Server error, please contact staff" });
+  try {
+    // Input validation
+    if (!name || !description || !price || !stock || !images || !category || images.length === 0) {
+      return res.status(400).send({ error: "Name, description, price, stock, images, and category are required" });
     }
+
+    if (typeof name !== 'string' || typeof description !== 'string') {
+      return res.status(400).send({ error: "Name and description must be strings" });
+    }
+
+    if (typeof price !== 'number' || price <= 0) {
+      return res.status(400).send({ error: "Price must be a positive number" });
+    }
+
+    if (typeof stock !== 'number' || stock < 0) {
+      return res.status(400).send({ error: "Stock must be a non-negative number" });
+    }
+
+    if (!validateArray(images, 'string')) {
+      return res.status(400).send({ error: "Images must be an array of strings" });
+    }
+
+    if (typeof category !== 'string') {
+      return res.status(400).send({ error: "Category must be a string" });
+    }
+
+    if (gender && typeof gender !== 'string') {
+      return res.status(400).send({ error: "Gender must be a string" });
+    }
+
+    if (sizes && !validateArray(sizes, 'string')) {
+      return res.status(400).send({ error: "Sizes must be an array of strings" });
+    }
+
+    if (colors && !validateArray(colors, 'string')) {
+      return res.status(400).send({ error: "Colors must be an array of strings" });
+    }
+
+    if (materials && !validateArray(materials, 'string')) {
+      return res.status(400).send({ error: "Materials must be an array of strings" });
+    }
+
+    if (features && !validateArray(features, 'string')) {
+      return res.status(400).send({ error: "Features must be an array of strings" });
+    }
+
+    if (percentOff !== undefined && (typeof percentOff !== 'number' || percentOff < 0 || percentOff > 100)) {
+      return res.status(400).send({ error: "PercentOff must be a number between 0 and 100" });
+    }
+
+    // Create and save product
+    const product = new Product({
+      name,
+      description,
+      gender,
+      percentOff,
+      sizes,
+      colors,
+      price,
+      stock,
+      images,
+      materials,
+      features,
+      category
+    });
+
+    await product.save();
+
+    res.status(201).send({ message: "Product uploaded successfully", product });
+  } catch (err) {
+    console.error('Server error during product upload:', err);
+    res.status(500).send({ error: "Server error, please contact staff" });
+  }
 };

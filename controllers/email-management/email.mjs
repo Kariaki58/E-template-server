@@ -1,25 +1,32 @@
-import { sendEmail } from "../Subscriber.mjs"
-import User from "../../models/users.mjs"
+import { sendEmail } from "../Subscriber.mjs";
+import User from "../../models/users.mjs";
 
 export const emailAutomate = async (req, res) => {
-    const requestBody = req.body
+    const { subject, message, userEmail } = req.body;
 
-    if (!requestBody.subject || !requestBody.message || !requestBody.userEmail) {
-        return res.status(400).send({ error: "please all input is request" })
+    // Validate input
+    if (!subject || !message || !userEmail) {
+        return res.status(400).send({ error: "Subject, message, and user email are required." });
     }
-    
+
     try {
-        const findAdmin = await User.findOne({ isAdmin: true }).select('-password')
+        // Find the admin user and exclude the password field
+        const findAdmin = await User.findOne({ isAdmin: true }).select('email -_id');
 
-        const { subject, message, userEmail } = requestBody
-
-        const feedback = sendEmail(userEmail, subject, findAdmin.email, message)
-
-        if (!feedback) {
-            return res.status(200).send({ message: "Email sent successfully"})
+        if (!findAdmin) {
+            return res.status(404).send({ error: "Admin user not found." });
         }
-        return res.status(500).send({ error: "could not send email please try again!" })
+
+        // Send the email
+        const emailSent = await sendEmail(userEmail, subject, findAdmin.email, message);
+
+        if (emailSent) {
+            return res.status(200).send({ message: "Email sent successfully." });
+        } else {
+            return res.status(500).send({ error: "Could not send email, please try again." });
+        }
     } catch (error) {
-        return res.status(500).send({ error: "could not send email please try again!"})
+        console.error("Error sending email:", error);
+        return res.status(500).send({ error: "Server error, please try again later." });
     }
-}
+};

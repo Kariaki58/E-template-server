@@ -1,30 +1,43 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const { Schema, model, Types } = mongoose;
+const { Schema, model } = mongoose;
+
 
 const productSchema = new Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
+        index: true
     },
     description: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     category: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
-    gender: String,
+    gender: {
+        type: String,
+        trim: true
+    },
     percentOff: {
         type: Number,
         min: 0,
-        max: 100
+        max: 100,
+        default: 0
     },
-    sizes: [String],
-    colors: [
-        String
-    ],
+    sizes: {
+        type: [String],
+        default: []
+    },
+    colors: {
+        type: [String],
+        default: []
+    },
     price: {
         type: Number,
         required: true,
@@ -37,10 +50,20 @@ const productSchema = new Schema({
     },
     images: {
         type: [String],
-        required: true
+        required: true,
+        validate: {
+            validator: (v) => v.length > 0,
+            message: 'At least one image is required'
+        }
     },
-    materials: [String],
-    features: [String],
+    materials: {
+        type: [String],
+        default: []
+    },
+    features: {
+        type: [String],
+        default: []
+    },
     rating: {
         average: {
             type: Number,
@@ -54,6 +77,15 @@ const productSchema = new Schema({
         }
     }
 }, { timestamps: true });
+
+
+productSchema.index({ name: 'text', description: 'text' });
+productSchema.index({ category: 1 });
+productSchema.index({ price: 1 });
+productSchema.index({ rating: { average: 1 } });
+productSchema.index({ category: 1, price: 1 });
+productSchema.index({ sizes: 1 });
+productSchema.index({ colors: 1 });
 
 const Product = model('Product', productSchema);
 

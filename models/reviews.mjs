@@ -1,29 +1,45 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
+const { Schema, model } = mongoose;
 
-const reviews = mongoose.Schema({
+const reviewSchema = new Schema({
     userId: {
-        type: mongoose.Schema.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     productId: {
-        type: mongoose.Schema.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Product',
         required: true
     },
     rating: {
         type: Number,
-        required: true
+        required: true,
+        min: 1, // Minimum rating
+        max: 5  // Maximum rating
     },
     comment: {
         type: String,
-        required: true
+        required: true,
+        trim: true // Remove leading and trailing spaces
     },
-    reviewImage: String,
-},  { timestamps: true })
+    reviewImage: {
+        type: String,
+        validate: {
+            validator: function(v) {
+                // Validate if reviewImage is a valid URL if present
+                return v === undefined || /^https?:\/\/.*/.test(v);
+            },
+            message: 'Invalid image URL'
+        }
+    }
+}, { timestamps: true });
 
+// Create model
+reviewSchema.index({ userId: 1 });
+reviewSchema.index({ productId: 1 });
 
-const Review = mongoose.model('Review', reviews)
+const Review = model('Review', reviewSchema);
 
-export default Review
+export default Review;

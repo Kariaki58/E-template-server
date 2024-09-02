@@ -1,21 +1,40 @@
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 
 
+/**
+ * Generate a JWT token with a 30-day expiration
+ * @param {string} _id - User ID to encode in the token
+ * @returns {string} - Generated JWT token
+ */
 export const generateToken = (_id) => {
     return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
-export const authenticateToken = (req, res, next) => {
-    const token = req.cookies.token || req.cookies._auth
-    if (!token) {
-        return res.sendStatus(401)
-    }
+/**
+ * Middleware to authenticate JWT tokens from cookies
+ */
+export const authenticateToken = async (req, res, next) => {
+    try {
+        // Get token from cookies
+        const token = req.cookies.token || req.cookies._auth;
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.sendStatus(403)
+        // Check if token is present
+        if (!token) {
+            return res.status(401).json({ error: 'Authentication token is missing' });
         }
-        req.user = user._id
-        next()
-    })
-}
+
+        // Verify token
+        jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+            if (err) {
+                return res.status(403).json({ error: 'Invalid or expired token' });
+            }
+
+            // Attach user ID to the request
+            req.user = user._id;
+            next();
+        });
+    } catch (error) {
+        console.error('Error in authenticateToken middleware:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

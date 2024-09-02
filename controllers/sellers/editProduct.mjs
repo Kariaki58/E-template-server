@@ -2,83 +2,96 @@ import Product from "../../models/products.mjs";
 
 export const editProduct = async (req, res) => {
     try {
-        let { _id: productId, name, description, gender, percentOff, sizes, colors, price, 
-            currency, stock, images, materials, features, rating, category 
+        const {
+            _id: productId,
+            name,
+            description,
+            gender,
+            percentOff,
+            sizes,
+            colors,
+            price,
+            currency,
+            stock,
+            images,
+            materials,
+            features,
+            rating,
+            category
         } = req.body;
-        if (!productId) {
-            return res.status(400).send({ error: "Product ID is required" });
-        }
+
+        // Early return if required fields are missing
+        if (!productId) return res.status(400).json({ error: "Product ID is required" });
         if (!name || !description || !price || !stock || !images || !category || images.length === 0) {
-            return res.status(400).send({ error: "Name, description, price, stock, images, and category are required" });
+            return res.status(400).json({ error: "Name, description, price, stock, images, and category are required" });
         }
 
+        // Validate and parse inputs
         if (typeof name !== 'string' || typeof description !== 'string') {
-            return res.status(400).send({ error: "Name and description must be strings" });
-        }
-        try {
-            price = Number(price)
-        } catch (err) {
-            return res.status(400).end({error: "price must be a number"})
-        }
-        if (typeof price !== 'number' || price <= 0) {
-            return res.status(400).send({ error: "Price must be a positive number" });
-        }
-        try {
-            stock = Number(stock);
-        } catch (err) {
-            return res.status(400).send({error: "stock must be a number"})
-        }
-        if (typeof stock !== 'number' || stock < 0) {
-            return res.status(400).send({ error: "Stock must be a non-negative number" });
+            return res.status(400).json({ error: "Name and description must be strings" });
         }
 
-        if (!Array.isArray(images) || images.some(img => typeof img !== 'string')) {
-            return res.status(400).send({ error: "Images must be an array of strings" });
+        const parsedPrice = parseFloat(price);
+        if (isNaN(parsedPrice) || parsedPrice <= 0) {
+            return res.status(400).json({ error: "Price must be a positive number" });
         }
 
-        if (sizes && (!Array.isArray(sizes) || sizes.some(size => typeof size !== 'string'))) {
-            return res.status(400).send({ error: "Sizes must be an array of strings" });
+        const parsedStock = parseInt(stock, 10);
+        if (isNaN(parsedStock) || parsedStock < 0) {
+            return res.status(400).json({ error: "Stock must be a non-negative number" });
         }
 
-        if (colors && (!Array.isArray(colors) || colors.some(color => typeof color !== 'string'))) {
-            return res.status(400).send({ error: "Colors must be an array of strings" });
+        const validateArrayOfStrings = (arr, name) => Array.isArray(arr) && arr.every(item => typeof item === 'string');
+        if (!validateArrayOfStrings(images, 'images')) return res.status(400).json({ error: "Images must be an array of strings" });
+        if (sizes && !validateArrayOfStrings(sizes, 'sizes')) return res.status(400).json({ error: "Sizes must be an array of strings" });
+        if (colors && !validateArrayOfStrings(colors, 'colors')) return res.status(400).json({ error: "Colors must be an array of strings" });
+        if (materials && !validateArrayOfStrings(materials, 'materials')) return res.status(400).json({ error: "Materials must be an array of strings" });
+        if (features && !validateArrayOfStrings(features, 'features')) return res.status(400).json({ error: "Features must be an array of strings" });
+
+        if (gender && typeof gender !== 'string') return res.status(400).json({ error: "Gender must be a string" });
+        if (currency && typeof currency !== 'string') return res.status(400).json({ error: "Currency must be a string" });
+
+        if (rating) {
+            if (typeof rating !== 'object' || typeof rating.average !== 'number' || typeof rating.count !== 'number') {
+                return res.status(400).json({ error: "Rating must be an object with numeric average and count" });
+            }
         }
 
-        if (materials && (!Array.isArray(materials) || materials.some(material => typeof material !== 'string'))) {
-            return res.status(400).send({ error: "Materials must be an array of strings" });
+        if (percentOff) {
+            if (typeof percentOff !== 'number' || percentOff < 0 || percentOff > 100) {
+                return res.status(400).json({ error: "PercentOff must be a number between 0 and 100" });
+            }
         }
 
-        if (gender && typeof gender !== 'string') {
-            return res.status(400).send({ error: "Gender must be a string" });
-        }
-
-        if (currency && typeof currency !== 'string') {
-            return res.status(400).send({ error: "Currency must be a string" });
-        }
-
-        if (features && (!Array.isArray(features) || features.some(feature => typeof feature !== 'string'))) {
-            return res.status(400).send({ error: "Features must be an array of strings" });
-        }
-
-        if (rating && (typeof rating !== 'object' || typeof rating.average !== 'number' || typeof rating.count !== 'number')) {
-            return res.status(400).send({ error: "Rating must be an object with numeric average and count" });
-        }
-
-        if (percentOff && (typeof percentOff !== 'number' || percentOff < 0 || percentOff > 100)) {
-            return res.status(400).send({ error: "PercentOff must be a number between 0 and 100" });
-        }
-
+        // Batch update in a single MongoDB operation
         const updatedProduct = await Product.findByIdAndUpdate(
             productId,
-            { $set: req.body },
-            { new: true }
+            {
+                $set: {
+                    name,
+                    description,
+                    gender,
+                    percentOff,
+                    sizes,
+                    colors,
+                    price: parsedPrice,
+                    currency,
+                    stock: parsedStock,
+                    images,
+                    materials,
+                    features,
+                    rating,
+                    category
+                }
+            },
+            { new: true, runValidators: true }
         );
 
-        if (!updatedProduct) {
-            return res.status(404).send({ error: "Product not found" });
-        }
-        res.status(200).send({ product: updatedProduct });
+        if (!updatedProduct) return res.status(404).json({ error: "Product not found" });
+
+        res.status(200).json({ product: updatedProduct });
     } catch (err) {
-        return res.status(500).send({ error: "Server error, please contact staff" });
+        console.error('Error updating product:', err);
+        res.status(500).json({ error: "Server error, please contact staff" });
     }
 };

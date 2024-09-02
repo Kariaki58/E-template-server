@@ -1,31 +1,40 @@
-import Cart from "../../../models/carts.mjs"
-
+import Cart from "../../../models/carts.mjs";
 
 export const editCart = async (req, res) => {
-    const { body: { pos, size, color }} = req
-    const _id = req.user
-    if (!pos || !size || !color) {
-        return res.status(400).send({error: "pos-size-color is required"})
-    }
-    if (typeof pos !== 'number') {
-        return res.status(400).send({error: "pos must be number"})
-    }
-    if (typeof size !== 'string') {
-        return res.status(400).send({error: "size must be a string"})
-    }
-    if (typeof color !== 'string') {
-        return res.status(400).send({ error: "color must be a string"})
-    }
-    const cart = await Cart.findOne({ userId: _id })
-    if (!cart) {
-        return res.status(400).send({ error: "no items in cart"})
-    }
-    if (pos > cart.items.length - 1) {
-        return res.status(400).send({error: "invalid position"})
-    }
-    cart.items[pos].color = color
-    cart.items[pos].size = size
+    try {
+        const { pos, size, color } = req.body;
+        const userId = req.user;
 
-    await cart.save()
-    return res.status(200).send({message: "changes saved"})
-}
+        // Validate input parameters
+        if (typeof pos !== 'number' || pos < 0) {
+            return res.status(400).json({ error: "Invalid position. Position must be a non-negative number." });
+        }
+
+        if (typeof size !== 'string' || typeof color !== 'string') {
+            return res.status(400).json({ error: "Size and color must be strings." });
+        }
+
+        // Retrieve the cart
+        const cart = await Cart.findOne({ userId });
+        if (!cart) {
+            return res.status(404).json({ error: "Cart not found." });
+        }
+
+        // Check if the position is within the bounds of the cart items
+        if (pos >= cart.items.length) {
+            return res.status(400).json({ error: "Invalid position. Position out of bounds." });
+        }
+
+        // Update the item in the cart
+        cart.items[pos].size = size;
+        cart.items[pos].color = color;
+
+        // Save the updated cart
+        await cart.save();
+
+        return res.status(200).json({ message: "Changes saved successfully.", cart });
+    } catch (err) {
+        console.error("Error editing cart:", err);
+        return res.status(500).json({ error: "Server error, please contact support." });
+    }
+};

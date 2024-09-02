@@ -1,41 +1,56 @@
-import Cart from "../../../models/carts.mjs"
-import Product from "../../../models/products.mjs";
+import Cart from "../../../models/carts.mjs";
 
 export const decrementCart = async (req, res) => {
-    const { body: { productId, quantity, pos } } = req
-    const user = req.user
+    try {
+        const { productId, quantity, pos } = req.body;
+        const user = req.user;
 
-    if (!productId || !quantity || pos === undefined) {
-        return res.status(400).send({ error: "productId, pos and quantity are required" });
+        // Validate required fields
+        if (!productId || !quantity || pos === undefined) {
+            return res.status(400).json({ error: "productId, pos, and quantity are required" });
+        }
+
+        // Validate user authentication
+        if (!user) {
+            return res.status(401).json({ error: "You are not logged in" });
+        }
+
+        // Validate quantity
+        if (typeof quantity !== 'number' || quantity <= 0) {
+            return res.status(400).json({ error: "Quantity must be a positive number" });
+        }
+        
+        const cart = await Cart.findOne({ userId: user }).select('items totalPrice').populate({
+            path: 'items.productId'
+        });
+
+        if (!cart) {
+            return res.status(400).json({ error: "Item not present in your cart" });
+        }
+
+        // Ensure valid position
+        if (pos < 0 || pos >= cart.items.length) {
+            return res.status(400).json({ error: "Invalid position" });
+        }
+
+        // Decrement the quantity of the item
+        const cartItem = cart.items[pos];
+        cartItem.quantity -= quantity;
+
+        // If quantity drops to zero or below, remove the item from the cart
+        if (cartItem.quantity <= 0) {
+            cart.items.splice(pos, 1);
+        }
+
+        // Recalculate the total price using the existing price data
+        cart.totalPrice = cart.items.reduce((total, item) => total + item.productId.price * item.quantity, 0);
+
+        // Save the updated cart with a single operation
+        await cart.save();
+
+        return res.status(200).json({ message: "Quantity updated successfully", cart });
+    } catch (err) {
+        console.error("Error updating cart:", err);
+        return res.status(500).json({ error: "Internal server error" });
     }
-
-    if (!user) {
-        return res.status(401).send({ error: "You are not logged in" });
-    }
-
-    let cart = await Cart.findOne({ userId: user }).populate('items.productId');
-
-    if (!cart) {
-        return res.status(400).send({ error: "item not present in your cart"})
-    }
-    const product = await Product.findById(productId);
-    if (!product) {
-        return res.status(404).send({ error: "Product not found" });
-    }
-
-    if (typeof quantity !== 'number' || quantity <= 0) {
-        return res.status(400).send({ error: "Quantity must be a positive number" });
-    }
-
-
-    if (pos > -1) {
-        cart.items[pos].quantity -= quantity;
-        cart.items[pos].price = product.price;
-    } else {
-        return res.status(400).send({ error: "invalid position"})
-    }
-    cart.totalPrice = cart.items.reduce((total, item) => total + item.price * item.quantity, 0);
-    await cart.save();
-
-    return res.status(200).send({ message: "quantity updated successfully", cart });
-}
+};

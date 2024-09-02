@@ -1,15 +1,29 @@
-import User from "../models/users.mjs"
-
+import User from "../models/users.mjs";
+import mongoose from "mongoose";
 
 export const isAdmin = async (req, res, next) => {
-    const { user } = req
+    try {
+        const { user } = req;
 
-    if (!user) {
-        return res.status(400).send({message: "you are not loged in"})
+        if (!user) {
+            return res.status(401).json({ error: "User not logged in" });
+        }
+
+        // Ensure user ID is valid before querying
+        if (!mongoose.Types.ObjectId.isValid(user)) {
+            return res.status(400).json({ error: "Invalid user ID" });
+        }
+
+        // Efficient query to check admin status
+        const verifyAdmin = await User.findById(user).select('isAdmin').exec();
+
+        if (!verifyAdmin || !verifyAdmin.isAdmin) {
+            return res.status(403).json({ error: "Unauthorized operation" });
+        }
+
+        next();
+    } catch (error) {
+        console.error("Error in isAdmin middleware:", error);
+        return res.status(500).json({ error: "Internal server error" });
     }
-    const verifyAdmin = await User.findOne({ _id: user }).select('-password')
-    if (!verifyAdmin || !verifyAdmin.isAdmin) {
-        return res.status(400).send({message: "unauthorize opperation"})
-    }
-    next()
-}
+};

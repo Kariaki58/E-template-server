@@ -1,73 +1,93 @@
+import mongoose from 'mongoose';
 import Cart from "../../../models/carts.mjs";
 import Product from "../../../models/products.mjs";
 
+
 export const addToCart = async (req, res) => {
     try {
-        const user = req.user;
-        const { productId, size, color, quantity } = req.body;
+        const userId = req.user;
+        const { productId, size, color, quantity = 1 } = req.body;
 
-        if (!productId || !quantity) {
-            return res.status(400).send({ error: "productId and quantity are required" });
+        // Input validation
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({ error: "Invalid product ID." });
         }
 
-        if (!user) {
-            return res.status(401).send({ error: "You are not logged in" });
+        if (!Number.isInteger(quantity) || quantity <= 0) {
+            return res.status(400).json({ error: "Quantity must be a positive integer." });
         }
 
-        const product = await Product.findById(productId);
+        // Fetch product details
+        const product = await Product.findById(productId).lean();
+
         if (!product) {
-            return res.status(404).send({ error: "Product not found" });
+            return res.status(404).json({ error: "Product not found." });
         }
 
-        if (typeof quantity !== 'number' || quantity <= 0) {
-            return res.status(400).send({ error: "Quantity must be a positive number" });
+        // Validate size and color if applicable
+        if (product.sizes.length && (!size || !product.sizes.includes(size))) {
+            return res.status(400).json({ error: "Invalid or missing size selection." });
         }
 
-        if (size && typeof size !== 'string') {
-            return res.status(400).send({error: "Size must be a string"});
-        }
-        if (color && typeof color !== "string") {
-            return res.status(400).send({error: "Color must be a string"});
+        if (product.colors.length && (!color || !product.colors.includes(color))) {
+            return res.status(400).json({ error: "Invalid or missing color selection." });
         }
 
-        let cart = await Cart.findOne({ userId: user }).populate('items.productId');
-        
-        if (!cart) {
-            cart = new Cart({
-                userId: user,
-                items: [],
-                totalPrice: 0,
-            });
+        // Check product stock availability
+        if (product.stock < quantity) {
+            return res.status(400).json({ error: `Only ${product.stock} item(s) available in stock.` });
         }
 
-        const existingItemIndex = cart.items.findIndex(item => {
-            return item.productId._id.toString() === productId &&
-            (!size || item.size === size) &&
-            (!color || item.color === color)
-            }
+        // Prepare cart item
+        const cartItem = {
+            productId: product._id,
+            size: size || null,
+            color: color || null,
+            quantity,
+            price: product.price
+        };
+
+        // Update or create cart atomically
+        const updatedCart = await Cart.findOneAndUpdate(
+            { userId },
+            {
+                $inc: { totalPrice: product.price * quantity },
+                $setOnInsert: { items: [] },
+                $set: { updatedAt: new Date() }
+            },
+            { new: true, upsert: true }
+        );
+
+        // Check if item already exists in cart
+        const existingItemIndex = updatedCart.items.findIndex(item =>
+            item.productId.equals(productId) &&
+            item.size === (size || null) &&
+            item.color === (color || null)
         );
 
         if (existingItemIndex > -1) {
-            cart.items[existingItemIndex].quantity += quantity;
-            cart.items[existingItemIndex].price = product.price;
+            // Update existing item quantity
+            updatedCart.items[existingItemIndex].quantity += quantity;
         } else {
-            cart.items.push({
-                productId,
-                size,
-                color,  
-                quantity,
-                price: product.price
-            });
+            // Add new item to cart
+            updatedCart.items.push(cartItem);
         }
 
-        cart.totalPrice = cart.items.reduce((total, item) => total + item.price * item.quantity, 0);
+        // Save updated cart
+        await updatedCart.save();
 
-        await cart.save();
+        // Populate product details for response
+        await updatedCart.populate({
+            path: 'items.productId',
+            select: 'name price images'
+        });
 
-        let cartResponse = await Cart.findOne({ userId: user }).populate('items.productId');
-
-        res.status(200).send({ message: "Product added to cart successfully", cart: cartResponse });
-    } catch (err) {
-        return res.status(500).send({ error: "Server error, please contact support" });
+        return res.status(200).json({
+            message: "Product added to cart successfully.",
+            cart: updatedCart
+        });
+    } catch (error) {
+        console.error("Error adding to cart:", error);
+        return res.status(500).json({ error: "Internal server error. Please contact support." });
     }
 };

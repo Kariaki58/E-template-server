@@ -4,49 +4,52 @@ export const removeFromCart = async (req, res) => {
     try {
         const user = req.user;
         const { pos, cid } = req.params;
-        let convertToNumber
-        try {
-            convertToNumber = parseInt(pos)
-        } catch (err) {
-            return res.status(400).send({ error: "cart must be an integer"})
-        }
-        // Validate request data
-        if (typeof convertToNumber !== 'number' || convertToNumber < 0) {
-            return res.status(400).send({ error: "Invalid position. Position must be a non-negative integer." });
+
+        // Validate request parameters
+        const position = parseInt(pos, 10);
+        if (isNaN(position) || position < 0) {
+            return res.status(400).json({ error: "Invalid position. Position must be a non-negative integer." });
         }
 
         if (!cid) {
-            return res.status(400).send({ error: "cart id is required." });
+            return res.status(400).json({ error: "Cart item ID (cid) is required." });
         }
 
         if (!user) {
-            return res.status(401).send({ error: "You are not logged in." });
+            return res.status(401).json({ error: "You are not logged in." });
         }
 
-        const cart = await Cart.findOne({ userId: user }).populate('items.productId');
+        // Fetch the user's cart
+        const cart = await Cart.findOne({ userId: user });
+        console.log(cart)
         if (!cart) {
-            return res.status(404).send({ error: "Cart not found." });
+            return res.status(404).json({ error: "Cart not found." });
         }
 
-        if (convertToNumber >= cart.items.length) {
-            return res.status(400).send({ error: "Invalid position. Position out of bounds." });
+        // Check if the position is within the bounds of the cart items
+        if (position >= cart.items.length) {
+            return res.status(400).json({ error: "Invalid position. Position out of bounds." });
         }
 
-        const item = cart.items[convertToNumber];
+        const item = cart.items[position];
+
+        // Check if the provided cart item ID matches the item at the specified position
         if (item._id.toString() !== cid) {
-            return res.status(400).send({ error: "cart id does not match the item at the specified position." });
+            return res.status(400).json({ error: "Cart item ID does not match the item at the specified position." });
         }
 
-        const itemPrice = parseFloat(item.price);
+        // Calculate the impact on the total price and remove the item
+        const itemPrice = item.price;
         const itemQuantity = item.quantity;
-        cart.items.splice(convertToNumber, 1);
-
         cart.totalPrice -= itemPrice * itemQuantity;
+        cart.items.splice(position, 1);
 
+        // Save the updated cart
         await cart.save();
 
-        res.status(200).send({ message: "Item removed from cart successfully.", cart });
+        return res.status(200).json({ message: "Item removed from cart successfully.", cart });
     } catch (err) {
-        return res.status(500).send({ error: "Server error, please contact support." });
+        console.error("Error removing item from cart:", err);
+        return res.status(500).json({ error: "Server error, please contact support." });
     }
 };

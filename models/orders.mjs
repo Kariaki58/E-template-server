@@ -2,31 +2,39 @@ import mongoose from 'mongoose';
 
 const { Schema, model } = mongoose;
 
+// Schema definition
 const orderSchema = new Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true, // Ensure userId is always present
+    index: true // Index for faster lookups
   },
   color: {
-    type: String
+    type: String,
+    trim: true // Remove leading and trailing spaces
   },
   size: {
-    type: String
+    type: String,
+    trim: true
   },
   quantity: {
     type: Number,
     required: true,
-    min: 1
+    min: 1,
+    default: 1 // Default value to prevent missing quantities
   },
   shippingAddress: {
     type: Schema.Types.ObjectId,
     ref: 'Address',
-    required: true
+    required: true,
+    index: true // Index for faster lookups
   },
   price: {
     type: Number,
     required: true,
-    min: 0
+    min: 0,
+    default: 0 // Default value for better handling
   },
   status: {
     type: String,
@@ -35,6 +43,7 @@ const orderSchema = new Schema({
   }
 }, { timestamps: true });
 
+// Create model
 const Order = model('Order', orderSchema);
 
 export default Order;

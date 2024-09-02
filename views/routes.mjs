@@ -1,5 +1,4 @@
 import Router from "router";
-import { home } from "../controllers/index.mjs";
 import { register } from "../controllers/authentication/register.mjs";
 import { login } from "../controllers/authentication/login.mjs";
 import { authenticateToken } from "../middleware/auth.mjs";
