@@ -21,7 +21,7 @@ app.use(compression());  // Compress responses
 app.use(helmet());  // Set security-related HTTP response headers
 
 // CORS configuration
-const allowedOrigins = process.env.FRONTEND;
+const allowedOrigins = 'https://kariaki.vercel.app'
 const corsOptions = {
   origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
