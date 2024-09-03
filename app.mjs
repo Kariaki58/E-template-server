@@ -58,7 +58,7 @@ app.use(routes);
 
 // Connect to MongoDB and start server
 mongoose
-  .connect(process.env.CONNECT_MONGO_LOCAL, {
+  .connect(process.env.CONNECT_MONGO, {
   })
   .then(() => {
     app.listen(process.env.PORT, () => {
