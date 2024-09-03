@@ -1,5 +1,40 @@
 import Email from "../../models/emailList.mjs";
+import User from "../../models/users.mjs";
+import crypto from 'crypto'
 import { sendEmail } from "../Subscriber.mjs";
+
+
+function generateUnsubscribeToken() {
+    return crypto.randomBytes(20).toString('hex');
+}
+
+
+export const UnsubscribeEndpoint = (req, res) => async (req, res) => {
+    try {
+        const { token } = req.params;
+
+        // Find the user by the unsubscribe token
+        const email = await Email.findOne({
+            unsubscribeToken: token,
+            unsubscribeTokenExpiry: { $gt: Date.now() } // Ensure token is not expired
+        });
+
+        if (!email) {
+            return res.status(400).send('Invalid or expired unsubscribe link.');
+        }
+
+        // Update the email's subscription status
+        email.isSubscribed = false;
+        email.unsubscribeToken = null; // Optionally, remove the token after use
+        email.unsubscribeTokenExpiry = null; // Clear the expiry time
+        await email.save();
+
+        res.send('You have successfully unsubscribed from our mailing list.');
+    } catch (error) {
+        console.error('Error during unsubscribe:', error);
+        res.status(500).send('An error occurred. Please try again.');
+    }
+}
 
 export const SubscribeToNewsLetter = async (req, res) => {
     const { email: recieverEmail } = req.body;
@@ -7,6 +42,9 @@ export const SubscribeToNewsLetter = async (req, res) => {
     if (!recieverEmail) {
         return res.status(400).send({ error: "Please provide your email." });
     }
+    const token = generateUnsubscribeToken();
+
+    const unsubscribeLink = `${process.env.FRONTEND}/unsubscribe/${token}`
 
     try {
         const template = `<!DOCTYPE html>
@@ -26,6 +64,7 @@ export const SubscribeToNewsLetter = async (req, res) => {
                     .button { display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #007BFF; color: #ffffff; text-decoration: none; border-radius: 4px; }
                     .footer { text-align: center; padding: 20px; font-size: 14px; color: #888888; }
                     .footer a { color: #007BFF; text-decoration: none; }
+                    p a { color: "blue"; text-decoration: none; }
                 </style>
             </head>
             <body>
@@ -39,9 +78,9 @@ export const SubscribeToNewsLetter = async (req, res) => {
                         <a href="https://kariaki.vercel.app/" class="button">Visit Our Website</a>
                     </div>
                     <div class="footer">
-                        <p>If you have any questions or need assistance, feel free to <a href="mailto:[Your Contact Email]">contact us</a>.</p>
+                        <p>If you have any questions or need assistance, feel free to <a href=mailto:${process.env.ADDRESS}>contact us</a>.</p>
                         <p>&copy; 2024 Overflow. All rights reserved.</p>
-                        <p><a href="[Unsubscribe Link]">Unsubscribe</a></p>
+                        <p><a href="${unsubscribeLink}">Unsubscribe</a></p>
                     </div>
                 </div>
             </body>
@@ -58,6 +97,9 @@ export const SubscribeToNewsLetter = async (req, res) => {
             }
 
             const newEmail = new Email({ email: recieverEmail });
+            newEmail.unsubscribeToken = token;
+            newEmail.unsubscribeTokenExpiry = tokenExpiry;
+
             await newEmail.save();
 
             return res.status(200).send({ message: "Thanks for subscribing, We are sure to give you the best offer." });

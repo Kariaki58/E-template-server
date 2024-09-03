@@ -3,7 +3,6 @@ import Product from "../../models/products.mjs";
 export const getUploads = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
 
-    console.log(page)
     // Validate page and limit parameters
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);

@@ -34,7 +34,7 @@ import { clearCart } from "../controllers/buyers/cart/clearCart.mjs";
 import { Analytics } from "../controllers/sellers/Analytics.mjs";
 import { Subscriber } from "../controllers/Subscriber.mjs";
 import { emailAutomate } from "../controllers/email-management/email.mjs";
-import { SubscribeToNewsLetter } from "../controllers/email-management/SubscribeToNewsLetter.mjs";
+import { SubscribeToNewsLetter, UnsubscribeEndpoint } from "../controllers/email-management/SubscribeToNewsLetter.mjs";
 
 
 const route = Router()
@@ -83,5 +83,6 @@ route.post('/make-admin', authenticateToken, Subscriber)
 
 route.post('/send/email', emailAutomate)
 route.post('/newsletter', SubscribeToNewsLetter)
+route.get('/unsubscribe/:token', UnsubscribeEndpoint)
 
 export default route

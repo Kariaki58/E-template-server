@@ -20,7 +20,10 @@ export const removeFromCart = async (req, res) => {
         }
 
         // Fetch the user's cart
-        const cart = await Cart.findOne({ userId: user });
+        const cart = await Cart.findOne({ userId: user }).populate({
+            path: 'items.productId'
+        });
+
         if (!cart) {
             return res.status(404).json({ error: "Cart not found." });
         }
