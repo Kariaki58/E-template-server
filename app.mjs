@@ -21,7 +21,7 @@ app.use(compression());  // Compress responses
 app.use(helmet());  // Set security-related HTTP response headers
 
 // CORS configuration
-const allowedOrigins = 'https://apiduct.vercel.app'
+const allowedOrigins = 'http://localhost:5173'
 const corsOptions = {
   origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
@@ -30,7 +30,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 15 * 60 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per windowMs
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
@@ -58,10 +58,12 @@ app.use(routes);
 
 // Connect to MongoDB and start server
 mongoose
-  .connect(process.env.CONNECT_MONGO, {
+  .connect(process.env.CONNECT_MONGO_LOCAL, {
   })
   .then(() => {
-    app.listen(process.env.PORT, () => {});
+    app.listen(process.env.PORT, () => {
+      console.log("listening at PORT", process.env.PORT)
+    });
   })
   .catch(err => {
   });
