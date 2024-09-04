@@ -30,10 +30,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 60 * 1000, // 15 hours
-    max: 1000, // Limit each IP to 100 requests per windowMs
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    windowMs: 15 * 60 * 60 * 1000,
+    max: 1000,
+    standardHeaders: true,
+    legacyHeaders: false,
     handler: (req, res, next) => {
       return res.status(429).json({
         message: "Too many requests, please try again later."
@@ -57,8 +57,10 @@ app.use((req, res, next) => {
 app.use(routes);
 
 // Connect to MongoDB and start server
+
+
 mongoose
-  .connect(process.env.CONNECT_MONGO_LOCAL, {
+  .connect(process.env.CONNECT_MONGO, {
   })
   .then(() => {
     app.listen(process.env.PORT, () => {
