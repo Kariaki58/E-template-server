@@ -1,5 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
+import dotenv from 'dotenv'
 
+dotenv.config()
 
 // cloudinary configuration
 cloudinary.config({
@@ -34,3 +36,13 @@ export const generateSignature = (req, res, next) => {
     return res.status(500).send({error: "An error happend during file upload. please try again"})
   }
 }
+
+
+export const removeFromCloudinary = async (public_id_of_the_image) => {
+  try {
+    const result = await cloudinary.uploader.destroy(`images/${public_id_of_the_image}`);
+    return result
+  } catch (error) {
+    return 'error occured'
+  }
+};

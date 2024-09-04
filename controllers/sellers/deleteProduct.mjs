@@ -1,6 +1,7 @@
 import Product from "../../models/products.mjs";
 import Cart from "../../models/carts.mjs";
 import Order from "../../models/orders.mjs";
+import { removeFromCloudinary } from "../../utils/cloudinary.mjs";
 
 
 export const getAllProducts = async (req, res) => {
@@ -39,6 +40,16 @@ export const deleteProduct = async (req, res) => {
         }
 
         // Find and delete the product
+
+        const findProduct = await Product.findById(productId)
+    
+        findProduct.images.forEach(async(imgId) => {
+            const deleteProductImage = imgId.split('/')[imgId.split('/').length - 1].split('.')[0]
+            const hasResult = await removeFromCloudinary(deleteProductImage)
+            if (!hasResult.result) {
+                return res.status(400).send({ error: "error image formate is not correct" })
+            }
+        })
         const deletedProduct = await Product.findByIdAndDelete(productId);
         if (!deletedProduct) {
             return res.status(404).json({ error: "Product not found" });
