@@ -21,7 +21,7 @@ app.use(compression());  // Compress responses
 app.use(helmet());  // Set security-related HTTP response headers
 
 // CORS configuration
-const allowedOrigins = process.env.FRONTEND
+const allowedOrigins = "https://apiduct.vercel.app"
 const corsOptions = {
   origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
@@ -56,12 +56,15 @@ app.use((req, res, next) => {
 // Use routes
 app.use(routes);
 
+
+const port = process.env.PORT || 3000;
+
 // Connect to MongoDB and start server
 mongoose
-  .connect(process.env.CONNECT_MONGO_LOCAL, {
+  .connect(process.env.CONNECT_MONGO, {
   })
   .then(() => {
-    app.listen(process.env.PORT, () => {
+    app.listen(port, () => {
     });
   })
   .catch(err => {
