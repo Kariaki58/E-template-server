@@ -21,7 +21,7 @@ app.use(compression());  // Compress responses
 app.use(helmet());  // Set security-related HTTP response headers
 
 // CORS configuration
-const allowedOrigins = 'http://localhost:5173'
+const allowedOrigins = 'https://apiduct.vercel.app'
 const corsOptions = {
   origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
