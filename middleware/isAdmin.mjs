@@ -23,7 +23,6 @@ export const isAdmin = async (req, res, next) => {
 
         next();
     } catch (error) {
-        console.error("Error in isAdmin middleware:", error);
         return res.status(500).json({ error: "Internal server error" });
     }
 };

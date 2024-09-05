@@ -20,7 +20,6 @@ export const addTransaction = async (req, res) => {
     await newTransaction.save();
     res.status(201).send({ message: 'Transaction recorded successfully', transaction: newTransaction });
   } catch (error) {
-    console.error('Error recording transaction:', error);
     res.status(500).send({ error: 'Error recording transaction' });
   }
 };
@@ -42,7 +41,6 @@ export const getUserTransactions = async (req, res) => {
 
     res.status(200).send({ transactions });
   } catch (error) {
-    console.error('Error fetching user transactions:', error);
     res.status(500).send({ error: 'Error fetching transactions' });
   }
 };
@@ -62,7 +60,6 @@ export const getAllTransactions = async (req, res) => {
 
     res.status(200).send({ transactions });
   } catch (error) {
-    console.error('Error fetching all transactions:', error);
     res.status(500).send({ error: 'Error fetching transactions' });
   }
 };

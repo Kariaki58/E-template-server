@@ -90,7 +90,6 @@ export const uploadProducts = async (req, res) => {
 
     res.status(201).send({ message: "Product uploaded successfully", product });
   } catch (err) {
-    console.error('Server error during product upload:', err);
     res.status(500).send({ error: "Server error, please contact staff" });
   }
 };

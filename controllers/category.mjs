@@ -29,7 +29,6 @@ export const categories = async (req, res) => {
     return res.status(200).send({ message: updatedCategories });
 
   } catch (err) {
-    console.error('Server error during category cleanup:', err);
     return res.status(500).send({ error: "Server error, please contact staff" });
   }
 };

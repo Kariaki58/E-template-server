@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Address from "../../../models/address.mjs";
 
 
@@ -9,11 +10,17 @@ export const editAddress = async (req, res) => {
     if (!addressId) {
         return res.status(400).json({ error: "Address ID is required." });
     }
+    if (mongoose.isValidObjectId(addressId)) {
+        return res.status(400).json({ error: "not a valid object id" })
+    }
 
     if (!address || !city || !state || !country || !phoneNumber) {
         return res.status(400).json({ error: "All required fields must be provided." });
     }
 
+    if (typeof address !== 'string' || typeof city !== 'string' || typeof state !== 'string' || typeof country !== 'string' || typeof phoneNumber !== 'string') {
+        return res.status(400).send({ error: "all feed must be a string" })
+    }
     try {
         const updatedAddress = await Address.findOneAndUpdate(
             { _id: addressId, userId: userId },
@@ -27,7 +34,6 @@ export const editAddress = async (req, res) => {
 
         res.status(200).json(updatedAddress);
     } catch (error) {
-        console.error("Error in editAddress endpoint:", error);
         res.status(500).json({ error: "Failed to update address." });
     }
 };

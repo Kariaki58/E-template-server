@@ -35,7 +35,7 @@ import { Analytics } from "../controllers/sellers/Analytics.mjs";
 import { Subscriber } from "../controllers/Subscriber.mjs";
 import { emailAutomate } from "../controllers/email-management/email.mjs";
 import { SubscribeToNewsLetter, UnsubscribeEndpoint } from "../controllers/email-management/SubscribeToNewsLetter.mjs";
-
+import { addNonAuthOrder } from "../controllers/sellers/addNonAuthOrder.mjs";
 
 const route = Router()
 
@@ -67,6 +67,7 @@ route.get('/products/:id', productPage)
 route.post('/order/place', nonAuthOrder)
 
 route.post('/order', authenticateToken, addOrder);
+route.post('/order/add', addNonAuthOrder)
 route.get('/order/user', authenticateToken, getUserOrders);
 route.get('/order/admin', authenticateToken, isAdmin, getAllOrders);
 route.get('/user/address/:orderId', getUserAddress);

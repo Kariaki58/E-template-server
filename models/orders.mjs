@@ -7,7 +7,6 @@ const orderSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true, // Ensure userId is always present
     index: true // Index for faster lookups
   },
   color: {

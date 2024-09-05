@@ -91,7 +91,6 @@ export const editProduct = async (req, res) => {
 
         res.status(200).json({ product: updatedProduct });
     } catch (err) {
-        console.error('Error updating product:', err);
         res.status(500).json({ error: "Server error, please contact staff" });
     }
 };

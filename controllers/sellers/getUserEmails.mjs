@@ -26,7 +26,6 @@ export const getUserEmails = async (req, res) => {
             limit: limitNum
         });
     } catch (error) {
-        console.error('Error fetching user emails:', error);
         return res.status(500).send({ error: "Server error, please contact staff" });
     }
 };

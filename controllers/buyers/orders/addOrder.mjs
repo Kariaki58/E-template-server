@@ -1,10 +1,30 @@
 import Order from "../../../models/orders.mjs";
 import Address from "../../../models/address.mjs";
 import Cart from "../../../models/carts.mjs";
+import mongoose from "mongoose";
+
 
 export const addOrder = async (req, res) => {
     const { user: userId, body: { cartId, shippingDetails } } = req;
 
+    if (!cartId || !shippingDetails.address || !shippingDetails.city || !shippingDetails.state  ||
+        !shippingDetails.country || !shippingDetails.phone || !shippingDetails.email || !shippingDetails.name
+    ) {
+        return res.status(400).send({ error: "all input are required" })
+    }
+
+    if (!mongoose.isValidObjectId(cartId)) {
+        return res.status(400).send({ error: "not a valid mongodb id" })
+    }
+    try {
+        shippingDetails.forEach(other => {
+            if (typeof other !== 'string') {
+                throw new Error('all input must be string')
+            }
+        });
+    } catch (error) {
+        return res.status(400).send(error.message)
+    }
     try {
         const findCart = await Cart.findById(cartId).populate('items.productId');
         if (!findCart) {
@@ -49,7 +69,7 @@ export const getUserOrders = async (req, res) => {
     try {
         const orders = await Order.find({ userId }).populate('shippingAddress').exec();
         
-        res.status(200).send(orders);
+        res.status(200).send({ orders });
     } catch (error) {
         res.status(500).send({ error: 'Error fetching orders', details: error.message });
     }
@@ -58,7 +78,7 @@ export const getUserOrders = async (req, res) => {
 export const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.find({}).populate('shippingAddress').exec();
-        res.status(200).send(orders);
+        res.status(200).send({ orders });
     } catch (error) {
         res.status(500).send({ error: 'Error fetching orders', details: error.message });
     }

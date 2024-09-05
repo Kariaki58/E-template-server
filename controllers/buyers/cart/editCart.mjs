@@ -34,7 +34,6 @@ export const editCart = async (req, res) => {
 
         return res.status(200).json({ message: "Changes saved successfully.", cart });
     } catch (err) {
-        console.error("Error editing cart:", err);
         return res.status(500).json({ error: "Server error, please contact support." });
     }
 };

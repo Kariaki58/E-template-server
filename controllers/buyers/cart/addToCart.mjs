@@ -8,6 +8,7 @@ export const addToCart = async (req, res) => {
         const userId = req.user;
         const { productId, size, color, quantity = 1 } = req.body;
 
+
         // Input validation
         if (!mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({ error: "Invalid product ID." });
@@ -87,7 +88,6 @@ export const addToCart = async (req, res) => {
             cart: updatedCart
         });
     } catch (error) {
-        console.error("Error adding to cart:", error);
         return res.status(500).json({ error: "Internal server error. Please contact support." });
     }
 };

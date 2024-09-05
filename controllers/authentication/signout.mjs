@@ -10,7 +10,6 @@ export const signout = (req, res) => {
         // Respond with a success message
         res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
-        console.error("Error during signout:", error); // Log error for debugging
         res.status(500).json({ error: 'Internal server error' });
     }
 };

@@ -1,10 +1,14 @@
 import Address from "../../../models/address.mjs";
+import mongoose from "mongoose";
 
 
 export const getAddress = async (req, res) => {
     const userId = req.user._id;
     const addressId = req.params.id;
 
+    if (!mongoose.isValidObjectId(addressId)) {
+        return res.status(400).send({ error: "not a valid id" })
+    }
     try {
         if (addressId) {
             if (!mongoose.Types.ObjectId.isValid(addressId)) {
@@ -23,7 +27,6 @@ export const getAddress = async (req, res) => {
         const addresses = await Address.find({ userId }).exec();
         res.status(200).json(addresses);
     } catch (error) {
-        console.error("Error in getAddress endpoint:", error);
         res.status(500).json({ error: "Failed to retrieve addresses.", details: error.message });
     }
 };

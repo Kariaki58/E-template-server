@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Address from "../../../models/address.mjs";
 
 export const deleteAddress = async (req, res) => {
@@ -6,6 +7,9 @@ export const deleteAddress = async (req, res) => {
 
     if (!addressId) {
         return res.status(400).json({ error: "Address ID is required." });
+    }
+    if (!mongoose.isValidObjectId(addressId)) {
+        return res.status(400).send({ error: "not a valid objectId" })
     }
 
     try {

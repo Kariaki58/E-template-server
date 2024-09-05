@@ -17,7 +17,6 @@ export const authenticateToken = async (req, res, next) => {
     try {
         // Get token from cookies
         const token = req.cookies.token || req.cookies._auth;
-
         // Check if token is present
         if (!token) {
             return res.status(401).json({ error: 'Authentication token is missing' });
@@ -34,7 +33,6 @@ export const authenticateToken = async (req, res, next) => {
             next();
         });
     } catch (error) {
-        console.error('Error in authenticateToken middleware:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };

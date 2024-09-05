@@ -14,14 +14,14 @@ dotenv.config();
 const app = express();
 
 // Middleware setup
-app.use(express.json({ limit: '10kb' }));  // Limit request body size to prevent attacks
+app.use(express.json({ limit: '50kb' }));  // Limit request body size to prevent attacks
 app.use(ExpressMongoSanitize());
 app.use(cookieParser());
 app.use(compression());  // Compress responses
 app.use(helmet());  // Set security-related HTTP response headers
 
 // CORS configuration
-const allowedOrigins = 'https://apiduct.vercel.app'
+const allowedOrigins = 'http://localhost:5173'
 const corsOptions = {
   origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
@@ -60,7 +60,7 @@ app.use(routes);
 
 
 mongoose
-  .connect(process.env.CONNECT_MONGO, {
+  .connect(process.env.CONNECT_MONGO_LOCAL, {
   })
   .then(() => {
     app.listen(process.env.PORT, () => {

@@ -24,8 +24,6 @@ export const productPage = async (req, res) => {
         return res.status(200).send({ product });
         
     } catch (error) {
-        // Log the error for debugging
-        console.error('Error fetching product:', error);
 
         // Return a generic server error message
         return res.status(500).send({ error: "Server error, please try again later" });

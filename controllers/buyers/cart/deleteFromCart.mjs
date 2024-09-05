@@ -51,7 +51,6 @@ export const removeFromCart = async (req, res) => {
 
         return res.status(200).json({ message: "Item removed from cart successfully.", cart });
     } catch (err) {
-        console.error("Error removing item from cart:", err);
         return res.status(500).json({ error: "Server error, please contact support." });
     }
 };

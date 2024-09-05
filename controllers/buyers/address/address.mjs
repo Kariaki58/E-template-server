@@ -6,12 +6,16 @@ export const addAddress = async (req, res) => {
     const { address, name, email, city, state, zip: zipCode, country, phone: phoneNumber } = req.body;
     const token = req.cookies.token || req.cookies._auth;
 
-    if (!token) {
-        return res.status(401).json({ error: "Authentication token is missing." });
+    let user
+    try {
+        if (token) {
+            user = jwt.verify(token, process.env.JWT_SECRET)._id;
+        }
+    } catch (error) {
+        return res.status(400).send({ error: "something went wrong" })
     }
 
     try {
-        const user = jwt.verify(token, process.env.JWT_SECRET)._id;
 
         if (!address || !city || !state || !country || !phoneNumber || !email || !name) {
             return res.status(400).json({ error: "All required fields must be provided." });

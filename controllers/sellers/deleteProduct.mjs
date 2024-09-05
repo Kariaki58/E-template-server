@@ -7,6 +7,7 @@ import { removeFromCloudinary } from "../../utils/cloudinary.mjs";
 export const getAllProducts = async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
+
         const options = {
             skip: (page - 1) * limit,
             limit: parseInt(limit)
@@ -25,7 +26,6 @@ export const getAllProducts = async (req, res) => {
             limit: options.limit
         });
     } catch (err) {
-        console.error('Error fetching products:', err);
         res.status(500).json({ error: "Server error, please contact staff" });
     }
 };
@@ -69,7 +69,6 @@ export const deleteProduct = async (req, res) => {
 
         res.status(200).json({ message: "Product and its references deleted successfully" });
     } catch (err) {
-        console.error('Error deleting product:', err);
         res.status(500).json({ error: "Server error, please contact staff" });
     }
 };

@@ -2,14 +2,20 @@ import User from "../../models/users.mjs";
 import bcrypt from 'bcryptjs';
 import { generateToken } from "../../middleware/auth.mjs";
 import Email from "../../models/emailList.mjs";
+import Cart from "../../models/carts.mjs";
+
 
 export const register = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, checkLocalCart } = req.body;
 
         // Validate input
         if (!email || !password) {
             return res.status(400).json({ error: 'Email and password are required' });
+        }
+
+        if ((checkLocalCart && !Array.isArray(checkLocalCart)) || (checkLocalCart && checkLocalCart.length <= 0)) {
+            return res.status(400).send({ error: "checkLocalCart must be an array" })
         }
 
         // Ensure email is unique across both collections
@@ -18,7 +24,8 @@ export const register = async (req, res) => {
             Email.findOne({ email }).exec()
         ]);
 
-        if (userExists || emailExists) {
+
+        if (userExists) {
             return res.status(400).json({ error: 'User already exists' });
         }
 
@@ -30,11 +37,40 @@ export const register = async (req, res) => {
         await newUser.save();
 
         // Save email to the Email collection
-        const saveUserEmail = new Email({ email });
-        await saveUserEmail.save();
+        if (!emailExists) {
+            const saveUserEmail = new Email({ email });
+            await saveUserEmail.save();
+        }
 
-        // Generate and send token
+        if (checkLocalCart && checkLocalCart.length > 0) {
+            const cartData = {
+                userId: '',
+                items: [],
+                totalPrice: 0
+            }
+            let calTotalPrice = 0
+            checkLocalCart.forEach(items => {
+                calTotalPrice += items.price * items.quantity
+
+                cartData.items.push({
+                    productId: items.productId._id,
+                    size: items.size,
+                    color: items.color,
+                    quantity: items.quantity,
+                    price: items.price
+                })
+            })
+            cartData.totalPrice = calTotalPrice
+            cartData.userId = newUser._id
+
+
+            const saveLocalCartInDb = new Cart(cartData)
+
+            await saveLocalCartInDb.save()
+        }
+
         const token = generateToken(newUser._id);
+
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',

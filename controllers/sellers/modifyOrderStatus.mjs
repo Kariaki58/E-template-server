@@ -24,7 +24,6 @@ export const modifyOrderStatus = async (req, res) => {
 
         res.status(200).json({ message: 'Order status updated successfully', order: updatedOrder });
     } catch (err) {
-        console.error('Error updating order status:', err); // Log detailed error
         res.status(500).json({ error: 'Error updating order status' });
     }
 };

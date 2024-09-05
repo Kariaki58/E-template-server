@@ -36,7 +36,6 @@ export const Analytics = async (req, res) => {
     // Send the result as a JSON response
     res.status(200).json({ dailyOrders, weeklyOrders, monthlyOrders, yearlyOrders });
   } catch (err) {
-    console.error('Error generating analytics:', err); // Log the error for debugging
     res.status(500).send({ error: 'Server Error' });
   }
 };

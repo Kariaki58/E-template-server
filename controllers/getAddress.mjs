@@ -13,16 +13,13 @@ export const getAddress = async (req, res) => {
         
         // Check if the address exists
         if (!userAddress) {
-            return res.status(404).send({ error: "Address not found" });
+            return res.status(200).send({ message: [] });
         }
 
         // Return the address information
         return res.status(200).send({ message: userAddress });
 
     } catch (error) {
-        // Log the error for debugging
-        console.error('Error fetching address:', error);
-
         // Return a server error response
         return res.status(500).send({ error: "Server error, please contact support" });
     }

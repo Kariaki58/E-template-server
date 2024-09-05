@@ -50,7 +50,6 @@ export const decrementCart = async (req, res) => {
 
         return res.status(200).json({ message: "Quantity updated successfully", cart });
     } catch (err) {
-        console.error("Error updating cart:", err);
         return res.status(500).json({ error: "Internal server error" });
     }
 };

@@ -26,7 +26,6 @@ export const getUploads = async (req, res) => {
             limit: limitNum
         });
     } catch (err) {
-        console.error('Error fetching products:', err);
         return res.status(500).send({ error: "Server error, please contact staff" });
     }
 };

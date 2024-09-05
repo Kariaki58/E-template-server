@@ -1,12 +1,17 @@
 import User from "../../models/users.mjs";
+import Cart from "../../models/carts.mjs";
 import { generateToken } from "../../middleware/auth.mjs";
 import bcrypt from 'bcryptjs';
 
 export const login = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, checkLocalCart } = req.body;
+
+    if ((checkLocalCart && !Array.isArray(checkLocalCart)) || (checkLocalCart && checkLocalCart.length <= 0)) {
+        return res.status(400).send({ error: "checkLocalCart must be an array" })
+    }
 
     try {
-        const user = await User.findOne({ email }).select('password isAdmin').exec();
+        const user = await User.findOne({ email }).select('password isAdmin _id').exec();
         if (!user) {
             return res.status(400).json({ error: 'User not found' });
         }
@@ -21,6 +26,27 @@ export const login = async (req, res) => {
         const token = generateToken(user._id);
         const isAdmin = user.isAdmin;
 
+        // add localstorage to the authenticated user cart in the database
+        if (checkLocalCart && checkLocalCart.length > 0) {
+            const findUserCart = await Cart.findOne({ userId: user._id })
+            if (findUserCart) {
+                let calTotalPrice = 0
+                checkLocalCart.forEach(items => {
+                    calTotalPrice += items.price * items.quantity
+
+                    findUserCart.items.push({
+                        productId: items.productId._id,
+                        size: items.size,
+                        color: items.color,
+                        quantity: items.quantity,
+                        price: items.price
+                    })
+                });
+                findUserCart.totalPrice += calTotalPrice
+            }
+            await findUserCart.save()
+        }
+        
         // Set cookie
         res.cookie('token', token, {
             httpOnly: true,
@@ -33,7 +59,6 @@ export const login = async (req, res) => {
         return res.json({ message: 'User login successful', token, isAdmin });
 
     } catch (error) {
-        console.error('Error during login:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
 };

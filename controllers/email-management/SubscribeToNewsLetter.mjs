@@ -31,7 +31,6 @@ export const UnsubscribeEndpoint = (req, res) => async (req, res) => {
 
         res.send('You have successfully unsubscribed from our mailing list.');
     } catch (error) {
-        console.error('Error during unsubscribe:', error);
         res.status(500).send('An error occurred. Please try again.');
     }
 }

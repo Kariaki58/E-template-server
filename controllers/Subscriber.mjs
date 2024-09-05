@@ -22,7 +22,6 @@ export const sendEmail = async (email, subject, receiver, template) => {
         await transporter.sendMail(mailOptions);
         return null;
     } catch (error) {
-        console.error('Error sending email:', error);
         return { error: 'An error occurred while sending the email. Please try again later.' };
     }
 };
@@ -82,7 +81,6 @@ export const Subscriber = async (req, res) => {
 
         return res.status(200).send({ message: "You now own the site! Please relogin to gain access." });
     } catch (error) {
-        console.error('Error processing subscription:', error);
         return res.status(500).send({ error: "An error occurred. Please contact support for assistance." });
     }
 };

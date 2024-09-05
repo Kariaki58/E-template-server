@@ -22,7 +22,6 @@ export const emailAutomate = async (req, res) => {
             return res.status(500).send({ error: "Could not send email, please try again." });
         }
     } catch (error) {
-        console.error("Error sending email:", error);
         return res.status(500).send({ error: "Server error, please try again later." });
     }
 };
