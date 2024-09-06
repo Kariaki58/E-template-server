@@ -14,7 +14,6 @@ export const getUserCart = async (req, res) => {
             return res.status(200).json({ message: "cart retrieved", cart: [] });
         }
 
-        console.log(userCart)
 
         return res.status(200).json({ message: "Cart retrieved successfully", cart: userCart });
     } catch (err) {

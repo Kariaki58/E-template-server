@@ -48,7 +48,6 @@ export const addToCart = async (req, res) => {
             price: product.price - (product.price * (product.percentOff / 100))
         };
 
-        console.log(cartItem)
 
         // Update or create cart atomically
         const updatedCart = await Cart.findOneAndUpdate(

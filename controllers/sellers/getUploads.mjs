@@ -19,8 +19,6 @@ export const getUploads = async (req, res) => {
 
         const total = await Product.countDocuments();
 
-        console.log(products)
-
         return res.status(200).send({
             message: products,
             total,
