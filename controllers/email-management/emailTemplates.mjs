@@ -119,3 +119,88 @@ export const generateEmailTemplate = (name, itemsList, shippingAddress, orderTot
 </body>
 </html>
 `;
+
+export const generateSimpleSellerNotificationTemplate = () => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #dddddd;
+        }
+        .header {
+            text-align: center;
+            background-color: #0a74da;
+            color: #ffffff;
+            padding: 10px 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .content p {
+            font-size: 16px;
+            color: #333333;
+        }
+        .button {
+            display: inline-block;
+            background-color: #0a74da;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            color: #777777;
+            background-color: #f4f4f4;
+        }
+        .footer a {
+            color: #0a74da;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>New Order Received</h1>
+        </div>
+
+        <div class="content">
+            <p>Hi there,</p>
+            <p>You have received a new order! To view the details and start processing the order, please visit your admin dashboard.</p>
+
+            <a href="${process.env.FRONTEND}/dashboard/admin" class="button">Go to Admin Dashboard</a>
+        </div>
+
+        <div class="footer">
+            <p>Thank you for being a part of Apiduct!</p>
+        </div>
+    </div>
+</body>
+</html>
+`;

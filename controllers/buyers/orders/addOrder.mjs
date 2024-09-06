@@ -4,7 +4,7 @@ import Cart from "../../../models/carts.mjs";
 import mongoose from "mongoose";
 import Product from "../../../models/products.mjs";
 import { sendEmail } from "../../Subscriber.mjs";
-import { generateEmailTemplate } from "../../email-management/emailTemplates.mjs";
+import { generateEmailTemplate, generateSimpleSellerNotificationTemplate } from "../../email-management/emailTemplates.mjs";
 
 
 export const addOrder = async (req, res) => {
@@ -65,17 +65,18 @@ export const addOrder = async (req, res) => {
             productStock.stock -= item.quantity
             await productStock.save()
         })
-        console.log(findCart.items)
         const template = generateEmailTemplate(shippingDetails.name, findCart.items, shippingDetails, findCart.totalPrice, process.env.ADDRESS)
         const subjectLine = "Thank You for Your Order! 🎉";
         const result = await sendEmail(process.env.ADDRESS, subjectLine, shippingDetails.email, template)
 
+        const notifyTemplateSeller = generateSimpleSellerNotificationTemplate()
 
-        if (result && result.error) {
+        const SellerResult = await sendEmail(process.env.ADDRESS, "Order Alert: A Customer Just Placed an Order!", process.env.ADDRESS, notifyTemplateSeller)
+        if ((result && result.error) || (SellerResult && SellerResult.error)) {
             return res.status(500).send({ error: "An unexpected error occured while sending email" })
         }
         await Cart.findByIdAndDelete(cartId);
-
+        
         res.status(201).send({ message: 'Order placed successfully', orders });
     } catch (error) {
         res.status(500).send({ error: 'Error placing order', details: error.message });
