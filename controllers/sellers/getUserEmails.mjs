@@ -1,7 +1,7 @@
 import User from "../../models/users.mjs";
 
 export const getUserEmails = async (req, res) => {
-    const { page = 1, limit = 10 } = req.query;
+    let { page = 1, limit = 10 } = req.query;
 
     try {
         page = Number(page)
