@@ -1,5 +1,5 @@
 import Product from "../../models/products.mjs";
-import { sendEmail } from "../Subscriber.mjs";
+
 
 // Utility function to validate arrays
 const validateArray = (arr, type) => 
