@@ -18,7 +18,7 @@ export const getAddress = async (req, res) => {
             const address = await Address.findOne({ _id: addressId, userId }).exec();
 
             if (!address) {
-                return res.status(404).json({ error: "Address not found or unauthorized." });
+                return res.status(200).json({ message: [] });
             }
 
             return res.status(200).json(address);
@@ -27,6 +27,6 @@ export const getAddress = async (req, res) => {
         const addresses = await Address.find({ userId }).exec();
         res.status(200).json(addresses);
     } catch (error) {
-        res.status(500).json({ error: "Failed to retrieve addresses.", details: error.message });
+        res.status(500).json({ error: "Failed to retrieve addresses." });
     }
 };

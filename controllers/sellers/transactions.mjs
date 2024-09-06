@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Transaction from "../../models/transactions.mjs";
 
 export const addTransaction = async (req, res) => {
@@ -6,6 +7,10 @@ export const addTransaction = async (req, res) => {
   // Validate input
   if (!orderId || !reference || !status || typeof amount !== 'number') {
     return res.status(400).send({ error: 'All fields are required and amount must be a number' });
+  }
+
+  if (!mongoose.isValidObjectId(orderId)) {
+    return res.status(400).send({ error: "not a valid id" })
   }
 
   try {

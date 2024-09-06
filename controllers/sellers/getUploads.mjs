@@ -1,7 +1,23 @@
 import Product from "../../models/products.mjs";
 
 export const getUploads = async (req, res) => {
-    const { page = 1, limit = 10 } = req.query;
+    let { page = 1, limit = 10 } = req.query;
+
+    try {
+        page = Number(page)
+    } catch (error) {
+        return res.status(400).send({ error: "page must be a number" })
+    }
+
+    try {
+        limit = Number(limit)
+    } catch (error) {
+        return res.status(400).send({ error: "limit must be a number" })
+    }
+
+    if (!Number.isInteger(page) || !Number.isInteger(limit)) {
+        return res.status(400).send({ error: "page and limit must be an integer" })
+    }
 
     // Validate page and limit parameters
     const pageNum = parseInt(page, 10);

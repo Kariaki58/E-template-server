@@ -14,11 +14,7 @@ export const removeFromCart = async (req, res) => {
         if (!cid) {
             return res.status(400).json({ error: "Cart item ID (cid) is required." });
         }
-
-        if (!user) {
-            return res.status(401).json({ error: "You are not logged in." });
-        }
-
+        
         // Fetch the user's cart
         const cart = await Cart.findOne({ userId: user }).populate({
             path: 'items.productId'

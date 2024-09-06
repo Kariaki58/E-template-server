@@ -5,10 +5,12 @@ export const productPage = async (req, res) => {
     try {
         const { id } = req.params;
 
-
+        if (!id) {
+            return res.status(400).send({ error: "id is required" })
+        }
         // Validate the ObjectId format
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).send({ error: "Invalid product ID format" });
+            return res.status(400).send({ error: "Invalid id" });
         }
 
         // Fetch the product by ID

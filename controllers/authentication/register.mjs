@@ -2,6 +2,7 @@ import User from "../../models/users.mjs";
 import bcrypt from 'bcryptjs';
 import { generateToken } from "../../middleware/auth.mjs";
 import Email from "../../models/emailList.mjs";
+import validator from "validator";
 import Cart from "../../models/carts.mjs";
 
 
@@ -11,7 +12,15 @@ export const register = async (req, res) => {
 
         // Validate input
         if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password are required' });
+            return res.status(400).json({ error: 'Email and password is required' });
+        }
+
+        if (!validator.isEmail(email)) {
+            return res.status(400).send({ error: "not a valid email" })
+        }
+
+        if (password.length <= 5) {
+            return res.status(400).send({ error: "password is too short" })
         }
 
         if ((checkLocalCart && !Array.isArray(checkLocalCart)) || (checkLocalCart && checkLocalCart.length <= 0)) {

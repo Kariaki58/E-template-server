@@ -14,7 +14,7 @@ export const addToCart = async (req, res) => {
             return res.status(400).json({ error: "Invalid product ID." });
         }
 
-        if (!Number.isInteger(quantity) || quantity <= 0) {
+        if (!Number.isInteger(quantity) && (quantity <= 0)) {
             return res.status(400).json({ error: "Quantity must be a positive integer." });
         }
 

@@ -2,6 +2,9 @@ import Order from "../../../models/orders.mjs";
 import Address from "../../../models/address.mjs";
 import Cart from "../../../models/carts.mjs";
 import mongoose from "mongoose";
+import Product from "../../../models/products.mjs";
+import { sendEmail } from "../../Subscriber.mjs";
+import { generateEmailTemplate } from "../../email-management/emailTemplates.mjs";
 
 
 export const addOrder = async (req, res) => {
@@ -56,6 +59,21 @@ export const addOrder = async (req, res) => {
         }));
 
         await Order.insertMany(orders);
+
+        findCart.items.map(async(item) => {
+            const productStock = await Product.findById(item.productId._id)
+            productStock.stock -= item.quantity
+            await productStock.save()
+        })
+        console.log(findCart.items)
+        const template = generateEmailTemplate(shippingDetails.name, findCart.items, shippingDetails, findCart.totalPrice, process.env.ADDRESS)
+        const subjectLine = "Thank You for Your Order! 🎉";
+        const result = await sendEmail(process.env.ADDRESS, subjectLine, shippingDetails.email, template)
+
+
+        if (result && result.error) {
+            return res.status(500).send({ error: "An unexpected error occured while sending email" })
+        }
         await Cart.findByIdAndDelete(cartId);
 
         res.status(201).send({ message: 'Order placed successfully', orders });

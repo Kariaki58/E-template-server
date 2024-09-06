@@ -8,6 +8,16 @@ export const emailAutomate = async (req, res) => {
         return res.status(400).send({ error: "Subject, message, and user email are required." });
     }
 
+    if (typeof subject !== 'string') {
+        return res.status(400).send({ error: "subject must be a string" })
+    }
+    if (typeof message !== 'string') {
+        return res.status(400).send({ error: "message must be a string" })
+    }
+    if (userEmail !== 'string') {
+        return res.status(400).send({ error: "user email must be a string" })
+    } 
+
     try {
         const findAdmin = await User.findOne({ isAdmin: true }).select('email -_id');
 

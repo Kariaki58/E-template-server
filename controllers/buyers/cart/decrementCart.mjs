@@ -10,11 +10,6 @@ export const decrementCart = async (req, res) => {
             return res.status(400).json({ error: "productId, pos, and quantity are required" });
         }
 
-        // Validate user authentication
-        if (!user) {
-            return res.status(401).json({ error: "You are not logged in" });
-        }
-
         // Validate quantity
         if (typeof quantity !== 'number' || quantity <= 0) {
             return res.status(400).json({ error: "Quantity must be a positive number" });

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Product from "../../models/products.mjs";
 
 export const editProduct = async (req, res) => {
@@ -22,6 +23,7 @@ export const editProduct = async (req, res) => {
 
         // Early return if required fields are missing
         if (!productId) return res.status(400).json({ error: "Product ID is required" });
+        if (!mongoose.isValidObjectId(productId)) return res.status(400).send({ error: "not a valid id" })
         if (!name || !description || !price || !stock || !images || !category || images.length === 0) {
             return res.status(400).json({ error: "Name, description, price, stock, images, and category are required" });
         }

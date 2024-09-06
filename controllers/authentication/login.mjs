@@ -2,6 +2,7 @@ import User from "../../models/users.mjs";
 import Cart from "../../models/carts.mjs";
 import { generateToken } from "../../middleware/auth.mjs";
 import bcrypt from 'bcryptjs';
+import validator from "validator";
 
 export const login = async (req, res) => {
     const { email, password, checkLocalCart } = req.body;
@@ -10,6 +11,16 @@ export const login = async (req, res) => {
         return res.status(400).send({ error: "checkLocalCart must be an array" })
     }
 
+    if (!email || !password) {
+        return res.status(400).send({ error: "email and password is required" })
+    }
+    if (!validator.isEmail(email)) {
+        return res.status(400).send({ error: "not a valid email" })
+    }
+    if (password.length <= 5) {
+        return res.status(400).send({ error: "password is too short" })
+    }
+    
     try {
         const user = await User.findOne({ email }).select('password isAdmin _id').exec();
         if (!user) {

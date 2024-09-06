@@ -4,6 +4,17 @@ import jwt from 'jsonwebtoken';
 
 export const addAddress = async (req, res) => {
     const { address, name, email, city, state, zip: zipCode, country, phone: phoneNumber } = req.body;
+
+    if (!address || !city || !state || !country || !phoneNumber || !email || !name) {
+        return res.status(400).json({ error: "All required fields must be provided." });
+    }
+
+    if (typeof address !== 'string' || typeof city !== 'string' || typeof state !== 'string' || 
+        typeof country !== 'string' || typeof phoneNumber !== 'string' || typeof email !== 'string' || 
+        typeof name !== 'string') {
+        return res.status(400).json({ error: "Invalid input types provided." });
+    }
+
     const token = req.cookies.token || req.cookies._auth;
 
     let user
@@ -16,17 +27,6 @@ export const addAddress = async (req, res) => {
     }
 
     try {
-
-        if (!address || !city || !state || !country || !phoneNumber || !email || !name) {
-            return res.status(400).json({ error: "All required fields must be provided." });
-        }
-
-        if (typeof address !== 'string' || typeof city !== 'string' || typeof state !== 'string' || 
-            typeof country !== 'string' || typeof phoneNumber !== 'string' || typeof email !== 'string' || 
-            typeof name !== 'string') {
-            return res.status(400).json({ error: "Invalid input types provided." });
-        }
-
         let addressDoc = await Address.findOneAndUpdate(
             { userId: user },
             {
@@ -43,7 +43,6 @@ export const addAddress = async (req, res) => {
         );
 
         if (addressDoc.isNew) {
-            // If a new address is created, also save the email to Email collection
             await Email.findOneAndUpdate(
                 { email },
                 { email },

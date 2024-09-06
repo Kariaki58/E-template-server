@@ -29,6 +29,6 @@ export const categories = async (req, res) => {
     return res.status(200).send({ message: updatedCategories });
 
   } catch (err) {
-    return res.status(500).send({ error: "Server error, please contact staff" });
+    return res.status(500).send({ error: "Server error" });
   }
 };

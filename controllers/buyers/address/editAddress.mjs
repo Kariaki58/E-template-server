@@ -10,7 +10,7 @@ export const editAddress = async (req, res) => {
     if (!addressId) {
         return res.status(400).json({ error: "Address ID is required." });
     }
-    if (mongoose.isValidObjectId(addressId)) {
+    if (!mongoose.isValidObjectId(addressId)) {
         return res.status(400).json({ error: "not a valid object id" })
     }
 

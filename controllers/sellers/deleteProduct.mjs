@@ -2,12 +2,28 @@ import Product from "../../models/products.mjs";
 import Cart from "../../models/carts.mjs";
 import Order from "../../models/orders.mjs";
 import { removeFromCloudinary } from "../../utils/cloudinary.mjs";
+import mongoose from "mongoose";
 
 
 export const getAllProducts = async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
 
+        try {
+            page = Number(page)
+        } catch (error) {
+            return res.status(400).send({ error: "page must be a number" })
+        }
+    
+        try {
+            limit = Number(limit)
+        } catch (error) {
+            return res.status(400).send({ error: "limit must be a number" })
+        }
+        
+        if (!Number.isInteger(page) || !Number.isInteger(limit)) {
+            return res.status(400).send({error: "page and limit must be an integer"})
+        }
         const options = {
             skip: (page - 1) * limit,
             limit: parseInt(limit)
@@ -37,6 +53,10 @@ export const deleteProduct = async (req, res) => {
 
         if (!productId) {
             return res.status(400).json({ error: "Product ID is required" });
+        }
+
+        if (!mongoose.isValidObjectId(productId)) {
+            return res.status(400).send({ error: "in valid product id" })
         }
 
         // Find and delete the product

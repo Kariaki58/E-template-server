@@ -1,12 +1,41 @@
 import Product from "../../../models/products.mjs";
 import Address from "../../../models/address.mjs";
 import Order from "../../../models/orders.mjs";
+import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 
 export const nonAuthOrder = async (req, res) => {
     let { user: userId, body: { color, size, quantity, productId, shippingDetails: shippingAddress } } = req;
     const token = req.cookies.token || req.cookies._auth;
 
+    if (color && typeof color !== 'string') {
+        return res.status(400).send({ error: "color must be a string" })
+    }
+    if (size && typeof size !== 'string') {
+        return res.status(400).send({ error: "size must be a string" })
+    }
+
+    if (!quantity) {
+        return res.status(400).send({ error: "quantity is required" })
+    }
+    if (!productId) {
+        return res.status(400).send({ error: "product id is required" })
+    }
+    if (!mongoose.isValidObjectId(productId)) {
+        return res.status(400).send({ error: "product Id is not a valid object id"})
+    }
+
+    if (!cartId || !shippingDetails.address || !shippingDetails.city || !shippingDetails.state  ||
+        !shippingDetails.country || !shippingDetails.phone || !shippingDetails.email || !shippingDetails.name
+    ) {
+        return res.status(400).send({ error: "all input are required" })
+    }
+
+    Object.values(shippingAddress).forEach(other => {
+        if (typeof other !== 'string') {
+            return res.status(400).send({ error: "all field must be a string" })
+        }
+    })
     try {
         if (token) {
             const user = jwt.verify(token, process.env.JWT_SECRET);
@@ -66,6 +95,8 @@ export const nonAuthOrder = async (req, res) => {
         });
 
         await newOrder.save();
+        product.stock -= quantity
+        await product.save()
         res.status(201).send({ message: 'Order placed successfully', order: newOrder });
 
     } catch (error) {

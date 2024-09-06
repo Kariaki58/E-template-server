@@ -34,6 +34,9 @@ export const Subscriber = async (req, res) => {
         if (!statuserror && (!reference || !status || !message || !transaction || !trxref || !email)) {
             return res.status(400).send({ error: 'All transaction details are required' });
         }
+        if (!statuserror && (typeof statuserror !== 'string' || typeof reference !== 'string' || typeof status !== 'string' || typeof message !== 'string' || typeof transaction !== 'string' || typeof trxref !== 'string' || typeof email !== 'string')) {
+            return res.status(400).send({ error: "all field must be a string" })
+        }
 
         // Fallback values for failed transactions
         const data = statuserror ? {
