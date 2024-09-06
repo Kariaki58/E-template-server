@@ -5,9 +5,8 @@ import { generateDeliveredOrderReviewTemplate, trackEmailTemplate, cancelEmailTe
 
 export const modifyOrderStatus = async (req, res) => {
     const { orderId } = req.params;
-    const { status, customTemplate } = req.body;
+    const {  status, customTemplate  } = req.body;
 
-    console.log(status)
     if (!orderId) {
         return res.status(400).send({ error: "order id is required" })
     }
@@ -53,6 +52,7 @@ export const modifyOrderStatus = async (req, res) => {
                 return res.status(400).send({ error: "Could not send review email to customer, contact the developer" });
             }
         } else if (updatedOrder.status === 'Cancelled') {
+
             if (!customTemplate) {
                 return res.status(400).send({ error: "sending an email is required" })
             }

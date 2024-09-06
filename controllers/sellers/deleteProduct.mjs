@@ -12,7 +12,6 @@ export const getAllProducts = async (req, res) => {
         try {
             page = Number(page)
         } catch (error) {
-            console.log(error)
             return res.status(400).send({ error: "page must be a number" })
         }
     

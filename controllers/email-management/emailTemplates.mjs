@@ -424,3 +424,5 @@ export const trackEmailTemplate = (name, orderId, status) => `
 export const cancelEmailTemplate = (name, orderId) => `
 ...
 `
+
+// export const uploadNewProductEmailTemplate
