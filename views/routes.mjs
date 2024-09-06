@@ -36,6 +36,8 @@ import { Subscriber } from "../controllers/Subscriber.mjs";
 import { emailAutomate } from "../controllers/email-management/email.mjs";
 import { SubscribeToNewsLetter, UnsubscribeEndpoint } from "../controllers/email-management/SubscribeToNewsLetter.mjs";
 import { addNonAuthOrder } from "../controllers/sellers/addNonAuthOrder.mjs";
+import { applyCoupon } from "../controllers/sellers/applyCoupon.mjs";
+import { removeCoupon } from "../controllers/sellers/removeCoupon.mjs";
 
 const route = Router()
 
@@ -85,5 +87,8 @@ route.post('/make-admin', authenticateToken, Subscriber)
 route.post('/send/email', emailAutomate)
 route.post('/newsletter', SubscribeToNewsLetter)
 route.get('/unsubscribe/:token', UnsubscribeEndpoint)
+
+route.post('/admin/coupons', authenticateToken, isAdmin, applyCoupon)
+route.post('/admin/coupons/delete', authenticateToken, isAdmin, removeCoupon)
 
 export default route

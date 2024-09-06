@@ -30,6 +30,7 @@ const productSchema = new Schema({
         max: 100,
         default: 0
     },
+    couponPercent: Number,
     sizes: {
         type: [String],
         default: []
@@ -47,6 +48,9 @@ const productSchema = new Schema({
         type: Number,
         required: true,
         min: 0
+    },
+    coupon: {
+        type: 'string'
     },
     images: {
         type: [String],

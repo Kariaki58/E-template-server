@@ -34,7 +34,6 @@ export const getAllProducts = async (req, res) => {
             Product.find({}, null, options),
             Product.countDocuments()
         ]);
-
         res.status(200).json({
             products,
             total,
