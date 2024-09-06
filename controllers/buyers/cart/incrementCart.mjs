@@ -39,7 +39,8 @@ export const incrementCart = async (req, res) => {
         }
 
         // Find the product's price and increment the quantity
-        const productPrice = item.productId.price;
+        const productPrice = item.productId.price - (item.productId.price * (item.productId.percentOff / 100));
+        
         item.quantity += quantity;
         item.price = productPrice;
 

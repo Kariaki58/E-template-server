@@ -9,7 +9,6 @@ export const uploadProducts = async (req, res) => {
     productName: name,
     description,
     gender,
-    percentOff,
     size: sizes,
     color: colors,
     price,
@@ -66,16 +65,11 @@ export const uploadProducts = async (req, res) => {
       return res.status(400).send({ error: "Features must be an array of strings" });
     }
 
-    if (percentOff !== undefined && (typeof percentOff !== 'number' || percentOff < 0 || percentOff > 100)) {
-      return res.status(400).send({ error: "PercentOff must be a number between 0 and 100" });
-    }
-
     // Create and save product
     const product = new Product({
       name,
       description,
       gender,
-      percentOff,
       sizes,
       colors,
       price,

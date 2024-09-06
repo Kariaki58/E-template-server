@@ -2,12 +2,12 @@ import Product from "../../models/products.mjs";
 
 export const editProduct = async (req, res) => {
     try {
-        const {
+        let {
             _id: productId,
             name,
             description,
             gender,
-            percentOff,
+            percent,
             sizes,
             colors,
             price,
@@ -30,7 +30,6 @@ export const editProduct = async (req, res) => {
         if (typeof name !== 'string' || typeof description !== 'string') {
             return res.status(400).json({ error: "Name and description must be strings" });
         }
-
         const parsedPrice = parseFloat(price);
         if (isNaN(parsedPrice) || parsedPrice <= 0) {
             return res.status(400).json({ error: "Price must be a positive number" });
@@ -57,8 +56,13 @@ export const editProduct = async (req, res) => {
             }
         }
 
-        if (percentOff) {
-            if (typeof percentOff !== 'number' || percentOff < 0 || percentOff > 100) {
+        if (percent) {
+            try {
+                percent = Number(percent)
+            } catch (err) {
+                return res.status(400).send({ error: "percent must be an integer" })
+            }
+            if (typeof percent !== 'number' || percent < 0 || percent > 100) {
                 return res.status(400).json({ error: "PercentOff must be a number between 0 and 100" });
             }
         }
@@ -71,7 +75,7 @@ export const editProduct = async (req, res) => {
                     name,
                     description,
                     gender,
-                    percentOff,
+                    percentOff: percent,
                     sizes,
                     colors,
                     price: parsedPrice,

@@ -43,7 +43,7 @@ export const decrementCart = async (req, res) => {
         }
 
         // Recalculate the total price using the existing price data
-        cart.totalPrice = cart.items.reduce((total, item) => total + item.productId.price * item.quantity, 0);
+        cart.totalPrice = cart.items.reduce((total, item) => total + (item.productId.price - (item.productId.price * (item.productId.percentOff / 100))) * item.quantity, 0);
 
         // Save the updated cart with a single operation
         await cart.save();

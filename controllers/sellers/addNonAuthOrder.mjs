@@ -35,6 +35,7 @@ export const addNonAuthOrder = async (req, res) => {
 
         return res.status(200).send({ message: "thanks for placing your order" })
     } catch (error) {
+        console.log(error)
         return res.status(500).send({ error: "server error" })
     }
 }

@@ -56,14 +56,13 @@ app.use((req, res, next) => {
 // Use routes
 app.use(routes);
 
-// Connect to MongoDB and start server
-
 
 mongoose
   .connect(process.env.CONNECT_MONGO_LOCAL, {
   })
   .then(() => {
     app.listen(process.env.PORT, () => {
+      console.log("running...")
     });
   })
   .catch(err => {

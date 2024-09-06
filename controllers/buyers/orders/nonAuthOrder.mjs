@@ -55,7 +55,7 @@ export const nonAuthOrder = async (req, res) => {
             return res.status(404).send({ error: "Product not found" });
         }
 
-        const totalAmount = quantity * product.price;
+        const totalAmount = quantity * (product.price - (product.price * (product.percentOff / 100)));
         const newOrder = new Order({
             userId,
             color,

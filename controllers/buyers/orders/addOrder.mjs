@@ -17,7 +17,7 @@ export const addOrder = async (req, res) => {
         return res.status(400).send({ error: "not a valid mongodb id" })
     }
     try {
-        shippingDetails.forEach(other => {
+        Object.values(shippingDetails).forEach(other => {
             if (typeof other !== 'string') {
                 throw new Error('all input must be string')
             }
@@ -52,7 +52,7 @@ export const addOrder = async (req, res) => {
             size: item.size,
             quantity: item.quantity,
             shippingAddress: findAddress._id,
-            price: item.productId.price * item.quantity
+            price: (item.productId.price - (item.productId.price * (item.productId.percentOff / 100))) * item.quantity
         }));
 
         await Order.insertMany(orders);

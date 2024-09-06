@@ -7,13 +7,14 @@ export const getUserCart = async (req, res) => {
         const userCart = await Cart.findOne({ userId: user })
             .populate({
                 path: 'items.productId',
-                select: 'name price images stock' // Only select fields that are necessary
+                select: 'name price images stock percentOff' // Only select fields that are necessary
             })
             .lean();
-
         if (!userCart) {
-            return res.status(200).json({ message: [], cart: null });
+            return res.status(200).json({ message: "cart retrieved", cart: [] });
         }
+
+        console.log(userCart)
 
         return res.status(200).json({ message: "Cart retrieved successfully", cart: userCart });
     } catch (err) {

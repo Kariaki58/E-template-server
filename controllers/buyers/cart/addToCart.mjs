@@ -45,19 +45,22 @@ export const addToCart = async (req, res) => {
             size: size || null,
             color: color || null,
             quantity,
-            price: product.price
+            price: product.price - (product.price * (product.percentOff / 100))
         };
+
+        console.log(cartItem)
 
         // Update or create cart atomically
         const updatedCart = await Cart.findOneAndUpdate(
             { userId },
             {
-                $inc: { totalPrice: product.price * quantity },
+                $inc: { totalPrice: (product.price - (product.price * (product.percentOff / 100))) * quantity },
                 $setOnInsert: { items: [] },
                 $set: { updatedAt: new Date() }
             },
             { new: true, upsert: true }
         );
+
 
         // Check if item already exists in cart
         const existingItemIndex = updatedCart.items.findIndex(item =>
