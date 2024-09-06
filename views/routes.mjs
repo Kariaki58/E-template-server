@@ -38,6 +38,7 @@ import { SubscribeToNewsLetter, UnsubscribeEndpoint } from "../controllers/email
 import { addNonAuthOrder } from "../controllers/sellers/addNonAuthOrder.mjs";
 import { applyCoupon } from "../controllers/sellers/applyCoupon.mjs";
 import { removeCoupon } from "../controllers/sellers/removeCoupon.mjs";
+import { applyCouponAndGetDiscount } from "../controllers/sellers/applyCouponAndGetDiscount.mjs";
 
 const route = Router()
 
@@ -90,5 +91,6 @@ route.get('/unsubscribe/:token', UnsubscribeEndpoint)
 
 route.post('/admin/coupons', authenticateToken, isAdmin, applyCoupon)
 route.post('/admin/coupons/delete', authenticateToken, isAdmin, removeCoupon)
+route.post('/apply-coupon', applyCouponAndGetDiscount)
 
 export default route
