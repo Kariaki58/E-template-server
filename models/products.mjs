@@ -52,6 +52,9 @@ const productSchema = new Schema({
     coupon: {
         type: 'string'
     },
+    couponExpiration: {
+        type: Date,
+    },
     images: {
         type: [String],
         required: true,
