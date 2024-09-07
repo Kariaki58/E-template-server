@@ -1,9 +1,21 @@
 import Product from "../../models/products.mjs";
+import Faq from "../../models/faq.mjs";
 
 
 // Utility function to validate arrays
 const validateArray = (arr, type) => 
   Array.isArray(arr) && arr.every(item => typeof item === type);
+
+const validateFaqItems = (faqItems) => {
+  if (!Array.isArray(faqItems)) return false;
+
+  return faqItems.every(item => 
+    typeof item.question === 'string' &&
+    item.question.trim() !== '' &&
+    typeof item.answer === 'string' &&
+    item.answer.trim() !== ''
+  );
+};
 
 export const uploadProducts = async (req, res) => {
   const {
@@ -17,9 +29,16 @@ export const uploadProducts = async (req, res) => {
     images,
     materials,
     features,
-    category
+    category,
+    faqItems
   } = req.body;
 
+  if (faqItems) {
+    if (!validateFaqItems(faqItems)) {
+      return res.status(400).send({ error: "invalid request body" })
+    }
+  }
+  
   try {
     // Input validation
     if (!name || !description || !price || !stock || !images || !category || images.length === 0) {
@@ -82,6 +101,10 @@ export const uploadProducts = async (req, res) => {
     });
 
     await product.save();
+
+    const productFaq = new Faq({ faq: faqItems, productId: product.id })
+
+    await productFaq.save()
 
     res.status(201).send({ message: "Product uploaded successfully", product });
   } catch (err) {

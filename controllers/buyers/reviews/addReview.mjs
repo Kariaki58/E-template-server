@@ -30,6 +30,7 @@ export const addReview = async (req, res) => {
 
         return res.status(201).send({ message: "Thank you for your review" });
     } catch (error) {
+        console.log(error)
         return res.status(500).send({ error: "Server error, please try again later" });
     }
 };

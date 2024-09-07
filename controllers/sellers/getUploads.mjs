@@ -1,5 +1,6 @@
 import Product from "../../models/products.mjs";
 
+
 export const getUploads = async (req, res) => {
     let { page = 1, limit = 10 } = req.query;
 

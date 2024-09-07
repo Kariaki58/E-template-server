@@ -25,14 +25,7 @@ const reviewSchema = new Schema({
         trim: true // Remove leading and trailing spaces
     },
     reviewImage: {
-        type: String,
-        validate: {
-            validator: function(v) {
-                // Validate if reviewImage is a valid URL if present
-                return v === undefined || /^https?:\/\/.*/.test(v);
-            },
-            message: 'Invalid image URL'
-        }
+        type: String
     }
 }, { timestamps: true });
 
