@@ -39,6 +39,7 @@ import { addNonAuthOrder } from "../controllers/sellers/addNonAuthOrder.mjs";
 import { applyCoupon } from "../controllers/sellers/applyCoupon.mjs";
 import { removeCoupon } from "../controllers/sellers/removeCoupon.mjs";
 import { applyCouponAndGetDiscount } from "../controllers/sellers/applyCouponAndGetDiscount.mjs";
+import { sendEmailToCustomer } from "../controllers/email-management/sendEmailToCustomer.mjs";
 
 const route = Router()
 
@@ -92,5 +93,6 @@ route.get('/unsubscribe/:token', UnsubscribeEndpoint)
 route.post('/admin/coupons', authenticateToken, isAdmin, applyCoupon)
 route.post('/admin/coupons/delete', authenticateToken, isAdmin, removeCoupon)
 route.post('/apply-coupon', applyCouponAndGetDiscount)
+route.post('/admin/send-email', authenticateToken, isAdmin, sendEmailToCustomer)
 
 export default route
