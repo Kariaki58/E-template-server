@@ -18,7 +18,7 @@ export const removeCoupon = async (req, res) => {
     try {
         const result = await Product.updateMany(
             { coupon, couponPercent: Number(couponPercent) }, 
-            { $set: { coupon: '', couponPercent: 0 } }
+            { $set: { coupon: '', couponPercent: 0, couponExpiration: null } }
         );
 
         if (result.modifiedCount === 0) {
