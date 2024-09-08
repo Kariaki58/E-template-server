@@ -3,10 +3,18 @@ import Address from "../../../models/address.mjs";
 import Order from "../../../models/orders.mjs";
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
+import { sendEmail } from "../../Subscriber.mjs";
+import { generateEmailTemplate, generateSimpleSellerNotificationTemplate } from "../../email-management/emailTemplates.mjs";
+
 
 export const nonAuthOrder = async (req, res) => {
-    let { user: userId, body: { color, size, quantity, productId, shippingDetails: shippingAddress } } = req;
+    let { user: userId, body: { color, size, quantity, productId, shippingDetails: shippingAddress, totalAmount } } = req;
     const token = req.cookies.token || req.cookies._auth;
+
+    console.log("---------------IN HERE----------------")
+    if (!totalAmount) {
+        return res.sendStatus(400)
+    }
 
     if (color && typeof color !== 'string') {
         return res.status(400).send({ error: "color must be a string" })
@@ -25,8 +33,8 @@ export const nonAuthOrder = async (req, res) => {
         return res.status(400).send({ error: "product Id is not a valid object id"})
     }
 
-    if (!cartId || !shippingDetails.address || !shippingDetails.city || !shippingDetails.state  ||
-        !shippingDetails.country || !shippingDetails.phone || !shippingDetails.email || !shippingDetails.name
+    if (!shippingAddress.address || !shippingAddress.city || !shippingAddress.state  ||
+        !shippingAddress.country || !shippingAddress.phone || !shippingAddress.email || !shippingAddress.name
     ) {
         return res.status(400).send({ error: "all input are required" })
     }
@@ -79,27 +87,43 @@ export const nonAuthOrder = async (req, res) => {
             return res.status(400).send({ error: "Quantity must be a positive number" });
         }
 
-        const product = await Product.findById(productId).lean();
+        const product = await Product.findById(productId);
         if (!product) {
-            return res.status(404).send({ error: "Product not found" });
+        return res.status(404).send({ error: "Product not found" });
         }
 
-        const totalAmount = quantity * (product.price - (product.price * (product.percentOff / 100)));
+        // Proceed with creating the new order
         const newOrder = new Order({
-            userId,
-            color,
-            size,
-            quantity,
-            shippingAddress: findAddress._id,
-            price: totalAmount
+        productName: product.name,
+        userId,
+        color,
+        size,
+        quantity,
+        shippingAddress: findAddress._id,
+        price: Number(totalAmount) / 100
         });
 
         await newOrder.save();
-        product.stock -= quantity
-        await product.save()
+
+        // Update product stock and save
+        product.stock -= quantity;
+        await product.save();  // No error here, since `product` is a Mongoose document
+
+        const template = generateEmailTemplate(shippingAddress.name, process.env.ADDRESS)
+        const subjectLine = "Thank You for Your Order! 🎉";
+        const result = await sendEmail(process.env.ADDRESS, subjectLine, shippingAddress.email, template)
+
+        const notifyTemplateSeller = generateSimpleSellerNotificationTemplate()
+
+        const SellerResult = await sendEmail(process.env.ADDRESS, "Order Alert: A Customer Just Placed an Order!", process.env.ADDRESS, notifyTemplateSeller)
+        if ((result && result.error) || (SellerResult && SellerResult.error)) {
+            return res.status(500).send({ error: "An unexpected error occured while sending email" })
+        }
+
         res.status(201).send({ message: 'Order placed successfully', order: newOrder });
 
     } catch (error) {
+        console.log(error)
         res.status(500).send({ error: 'Error placing order' });
     }
 };

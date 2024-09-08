@@ -23,7 +23,6 @@ export const applyCouponAndGetDiscount = async(req, res) => {
         }
         return res.status(200).send({ discount: findCoupon.couponPercent })
     } catch (error) {
-        console.log(error)
         return res.status(400).send({ error: "server error" })
     }
 }

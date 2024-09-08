@@ -9,6 +9,9 @@ const orderSchema = new Schema({
     ref: 'User',
     index: true // Index for faster lookups
   },
+  productName: {
+    type: String
+  },
   color: {
     type: String,
     trim: true // Remove leading and trailing spaces

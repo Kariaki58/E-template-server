@@ -1,7 +1,8 @@
-import User from "../../models/users.mjs";
+import Email from "../../models/emailList.mjs";
 
 export const getUserEmails = async (req, res) => {
     let { page = 1, limit = 10 } = req.query;
+    
 
     try {
         page = Number(page)
@@ -28,15 +29,15 @@ export const getUserEmails = async (req, res) => {
 
     try {
         // Fetch paginated user emails
-        const users = await User.find({})
+        const emails = await Email.find({})
             .skip((pageNum - 1) * limitNum)
             .limit(limitNum)
             .select('email'); // Select only the email field
 
-        const total = await User.countDocuments();
+        const total = await Email.countDocuments();
 
         return res.status(200).send({
-            emails: users.map(user => user.email),
+            emails,
             total,
             page: pageNum,
             limit: limitNum

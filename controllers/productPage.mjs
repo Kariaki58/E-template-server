@@ -24,7 +24,6 @@ export const productPage = async (req, res) => {
         if (!product) {
             return res.status(404).send({ error: "Product not found" });
         }
-        console.log(review)
 
         // Return the product information
         return res.status(200).send({ product, faq, review });

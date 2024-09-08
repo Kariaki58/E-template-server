@@ -1,4 +1,4 @@
-export const generateEmailTemplate = (name, itemsList, shippingAddress, orderTotal, email) => `
+export const generateEmailTemplate = (name, email) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,27 +83,7 @@ export const generateEmailTemplate = (name, itemsList, shippingAddress, orderTot
 
         <div class="content">
             <h2>Hi ${name},</h2>
-            <p>Thank you for shopping with us! We are excited to let you know that we’ve received your order and it’s now being processed. Below are the details of your order:</p>
-
-            <div class="order-summary">
-                <h3>Order Summary</h3>
-                <p><strong>Items Ordered:</strong></p>
-                <ul>
-                    ${itemsList.map(item => `<li>${item.productId.name} - ${item.quantity} x ${item.price}</li>`).join('')}
-                </ul>
-                <p><strong>Sizes</strong></p>
-
-                <ul>
-                    ${itemsList.map(item => `<li>${item.productId.name} - ${item.size}</li>`).join('')}
-                </ul>
-                <p><strong>Colors</strong></p>
-                <ul>
-                    ${itemsList.map(item => `<li>${item.productId.name} - ${item.color}</li>`).join('')}
-                </ul>
-                <p><strong>Shipping Address:</strong></p>
-                <p>${shippingAddress.country}, ${shippingAddress.city}, ${shippingAddress.address}</p>
-                <p><strong>Total Amount:</strong> ${orderTotal}</p>
-            </div>
+            <p>Thank you for shopping with us! We are excited to let you know that we’ve received your order and it’s now being processed.</p>
 
             <p>We will notify you once your order has been shipped. You can track your order status through our website by logging into your account.</p>
             <p>If you have any questions or need further assistance, feel free to reply to this email or contact our customer support team at <a href="mailto:${email}">${email}</a>.</p>

@@ -8,7 +8,11 @@ import { generateEmailTemplate, generateSimpleSellerNotificationTemplate } from 
 
 
 export const addOrder = async (req, res) => {
-    const { user: userId, body: { cartId, shippingDetails } } = req;
+    const { user: userId, body: { cartId, shippingDetails, totalAmount } } = req;
+
+    if (!totalAmount) {
+        return res.sendStatus(400)
+    }
 
     if (!cartId || !shippingDetails.address || !shippingDetails.city || !shippingDetails.state  ||
         !shippingDetails.country || !shippingDetails.phone || !shippingDetails.email || !shippingDetails.name
@@ -51,11 +55,12 @@ export const addOrder = async (req, res) => {
 
         const orders = findCart.items.map(item => ({
             userId,
+            productName: item.productId.name,
             color: item.color,
             size: item.size,
             quantity: item.quantity,
             shippingAddress: findAddress._id,
-            price: (item.productId.price - (item.productId.price * (item.productId.percentOff / 100))) * item.quantity
+            price: Number(totalAmount)/100
         }));
 
         await Order.insertMany(orders);
@@ -65,7 +70,7 @@ export const addOrder = async (req, res) => {
             productStock.stock -= item.quantity
             await productStock.save()
         })
-        const template = generateEmailTemplate(shippingDetails.name, findCart.items, shippingDetails, findCart.totalPrice, process.env.ADDRESS)
+        const template = generateEmailTemplate(shippingDetails.name, process.env.ADDRESS)
         const subjectLine = "Thank You for Your Order! 🎉";
         const result = await sendEmail(process.env.ADDRESS, subjectLine, shippingDetails.email, template)
 
@@ -79,6 +84,7 @@ export const addOrder = async (req, res) => {
         
         res.status(201).send({ message: 'Order placed successfully', orders });
     } catch (error) {
+        console.log(error)
         res.status(500).send({ error: 'Error placing order', details: error.message });
     }
 };

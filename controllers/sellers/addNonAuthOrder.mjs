@@ -1,9 +1,16 @@
 import Order from "../../models/orders.mjs";
 import Address from "../../models/address.mjs";
+import { sendEmail } from "../Subscriber.mjs";
+import { generateEmailTemplate, generateSimpleSellerNotificationTemplate } from "../email-management/emailTemplates.mjs";
+
 
 export const addNonAuthOrder = async (req, res) => {
-    const { cart, shippingDetails, status } = req.body;
+    const { cart, shippingDetails, totalAmount } = req.body;
+
     
+    if (!totalAmount) {
+        return res.sendStatus(400)
+    }
     // Validate shipping details
     if (!shippingDetails.address || !shippingDetails.city || !shippingDetails.state  ||
         !shippingDetails.country || !shippingDetails.phone || !shippingDetails.email || !shippingDetails.name
@@ -16,11 +23,6 @@ export const addNonAuthOrder = async (req, res) => {
             throw new Error('All input must be strings');
         }
     });
-
-    // Validate status
-    if (!status) {
-        return res.status(400).send({ error: "Status is required" });
-    }
 
     // Validate cart
     if (!cart || !Array.isArray(cart) || cart.length === 0) {
@@ -61,14 +63,25 @@ export const addNonAuthOrder = async (req, res) => {
         // Save each order from the cart
         for (const item of cart) {
             const addOrder = new Order({
+                productName: item.productId.name,
                 color: item.color,
                 size: item.size,
                 quantity: item.quantity,
                 shippingAddress: addressDoc._id,
-                price: item.price,
-                status: status === 'success' ? 'Paid' : 'Pending'
+                price: Number(totalAmount)/100
             });
             await addOrder.save();
+        }
+
+        const template = generateEmailTemplate(shippingDetails.name, process.env.ADDRESS)
+        const subjectLine = "Thank You for Your Order! 🎉";
+        const result = await sendEmail(process.env.ADDRESS, subjectLine, shippingDetails.email, template)
+
+        const notifyTemplateSeller = generateSimpleSellerNotificationTemplate()
+
+        const SellerResult = await sendEmail(process.env.ADDRESS, "Order Alert: A Customer Just Placed an Order!", process.env.ADDRESS, notifyTemplateSeller)
+        if ((result && result.error) || (SellerResult && SellerResult.error)) {
+            return res.status(500).send({ error: "An unexpected error occured while sending email" })
         }
 
         return res.status(200).send({ message: "Thank you for placing your order" });

@@ -95,4 +95,5 @@ route.post('/admin/coupons/delete', authenticateToken, isAdmin, removeCoupon)
 route.post('/apply-coupon', applyCouponAndGetDiscount)
 route.post('/admin/send-email', authenticateToken, isAdmin, sendEmailToCustomer)
 
+
 export default route

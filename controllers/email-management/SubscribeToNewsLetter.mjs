@@ -1,23 +1,22 @@
 import Email from "../../models/emailList.mjs";
-import User from "../../models/users.mjs";
-import crypto from 'crypto'
+import crypto from 'crypto';
 import { sendEmail } from "../Subscriber.mjs";
 import { SubscribeToNewsLetterTemplate } from "./emailTemplates.mjs";
 
-
+// Function to generate unsubscribe token
 function generateUnsubscribeToken() {
     return crypto.randomBytes(20).toString('hex');
 }
 
-
-export const UnsubscribeEndpoint = (req, res) => async (req, res) => {
+// Unsubscribe endpoint
+export const UnsubscribeEndpoint = async (req, res) => {
     try {
         const { token } = req.params;
 
-        // Find the user by the unsubscribe token
+        // Find the user by the unsubscribe token and ensure it's not expired
         const email = await Email.findOne({
             unsubscribeToken: token,
-            unsubscribeTokenExpiry: { $gt: Date.now() } // Ensure token is not expired
+            unsubscribeTokenExpiry: { $gt: Date.now() }
         });
 
         if (!email) {
@@ -26,50 +25,65 @@ export const UnsubscribeEndpoint = (req, res) => async (req, res) => {
 
         // Update the email's subscription status
         email.isSubscribed = false;
-        email.unsubscribeToken = null; // Optionally, remove the token after use
-        email.unsubscribeTokenExpiry = null; // Clear the expiry time
+        email.unsubscribeToken = null;
+        email.unsubscribeTokenExpiry = null;
         await email.save();
 
-        res.send('You have successfully unsubscribed from our mailing list.');
+        return res.send('You have successfully unsubscribed from our mailing list.');
     } catch (error) {
-        res.status(500).send('An error occurred. Please try again.');
+        console.error('Error unsubscribing:', error);
+        return res.status(500).send('An error occurred. Please try again.');
     }
-}
+};
 
+// Subscribe to the newsletter
 export const SubscribeToNewsLetter = async (req, res) => {
-    const { email: recieverEmail } = req.body;
+    const { email: receiverEmail } = req.body;
 
-    if (!recieverEmail) {
+    if (!receiverEmail) {
         return res.status(400).send({ error: "Please provide your email." });
     }
-    const token = generateUnsubscribeToken();
 
-    const unsubscribeLink = `${process.env.FRONTEND}/unsubscribe/${token}`
+    const token = generateUnsubscribeToken();
+    const tokenExpiry = Date.now() + 24 * 60 * 60 * 1000; // Token valid for 24 hours
+    const unsubscribeLink = `${process.env.FRONTEND}/unsubscribe/${token}`;
 
     try {
-        const template = SubscribeToNewsLetterTemplate(unsubscribeLink)
+        // Check if the email already exists
+        let existingEmail = await Email.findOne({ email: receiverEmail });
 
-        const senderEmail = process.env.ADDRESS;
-        const emailSent = await sendEmail(senderEmail, 'Thank you for subscribing to our newsletter', recieverEmail, template);
-
-        if (!emailSent) {
-            let existingEmail = await Email.findOne({ email: recieverEmail });
-            if (existingEmail) {
-                return res.status(200).send({ message: "We are sure to give you the best offer." });
-            }
-
-            const newEmail = new Email({ email: recieverEmail });
-            newEmail.unsubscribeToken = token;
-            newEmail.unsubscribeTokenExpiry = tokenExpiry;
-
-            await newEmail.save();
-
-            return res.status(200).send({ message: "Thanks for subscribing, We are sure to give you the best offer." });
-        } else {
-            return res.status(500).send({ error: "Sorry, an error occurred while sending the email." });
+        if (existingEmail && existingEmail.isSubscribed) {
+            return res.status(200).send({ message: "You are already subscribed to our newsletter." });
         }
 
+        // Create or update the email record
+        if (!existingEmail) {
+            existingEmail = new Email({
+                email: receiverEmail,
+                unsubscribeToken: token,
+                unsubscribeTokenExpiry: tokenExpiry,
+                isSubscribed: true
+            });
+        } else {
+            existingEmail.unsubscribeToken = token;
+            existingEmail.unsubscribeTokenExpiry = tokenExpiry;
+            existingEmail.isSubscribed = true;
+        }
+
+        await existingEmail.save();
+
+        // Send the subscription confirmation email
+        const template = SubscribeToNewsLetterTemplate(unsubscribeLink);
+        const senderEmail = process.env.ADDRESS;
+        const emailSent = await sendEmail(senderEmail, 'Thank you for subscribing to our newsletter', receiverEmail, template);
+
+        if (!emailSent) {
+            return res.status(200).send({ message: "Thanks for subscribing! We are sure to give you the best offers." });
+        } else {
+            return res.status(500).send({ error: "An error occurred while sending the confirmation email." });
+        }
     } catch (error) {
+        console.error(error);
         return res.status(500).send({ error: "Sorry, an error occurred while processing your request." });
     }
 };
