@@ -33,7 +33,6 @@ export const abondonCarts = async (req, res) => {
             carts: abandonedCart
         });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'Failed to fetch abandoned carts' });
     }
 }
