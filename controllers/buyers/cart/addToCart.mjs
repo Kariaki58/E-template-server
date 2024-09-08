@@ -1,20 +1,18 @@
 import mongoose from 'mongoose';
-import Cart from "../../../models/carts.mjs";
-import Product from "../../../models/products.mjs";
-
+import Cart from '../../../models/carts.mjs';
+import Product from '../../../models/products.mjs';
 
 export const addToCart = async (req, res) => {
     try {
         const userId = req.user;
         const { productId, size, color, quantity = 1 } = req.body;
 
-
         // Input validation
         if (!mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({ error: "Invalid product ID." });
         }
 
-        if (!Number.isInteger(quantity) && (quantity <= 0)) {
+        if (!Number.isInteger(quantity) || quantity <= 0) {
             return res.status(400).json({ error: "Quantity must be a positive integer." });
         }
 
@@ -45,21 +43,24 @@ export const addToCart = async (req, res) => {
             size: size || null,
             color: color || null,
             quantity,
-            price: product.price - (product.price * (product.percentOff / 100))
+            price: product.price - (product.price * (product.percentOff / 100)),
+            lastUpdated: new Date() // Ensure we track when the item was last updated
         };
-
 
         // Update or create cart atomically
         const updatedCart = await Cart.findOneAndUpdate(
             { userId },
             {
-                $inc: { totalPrice: (product.price - (product.price * (product.percentOff / 100))) * quantity },
+                $inc: {
+                    totalPrice: (product.price - (product.price * (product.percentOff / 100))) * quantity
+                },
                 $setOnInsert: { items: [] },
-                $set: { updatedAt: new Date() }
+                $set: {
+                    updatedAt: new Date() // Update the cart's last activity timestamp
+                }
             },
             { new: true, upsert: true }
         );
-
 
         // Check if item already exists in cart
         const existingItemIndex = updatedCart.items.findIndex(item =>
@@ -69,8 +70,9 @@ export const addToCart = async (req, res) => {
         );
 
         if (existingItemIndex > -1) {
-            // Update existing item quantity
+            // Update existing item quantity and lastUpdated timestamp
             updatedCart.items[existingItemIndex].quantity += quantity;
+            updatedCart.items[existingItemIndex].lastUpdated = new Date();
         } else {
             // Add new item to cart
             updatedCart.items.push(cartItem);

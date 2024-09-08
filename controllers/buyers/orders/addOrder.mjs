@@ -84,7 +84,6 @@ export const addOrder = async (req, res) => {
         
         res.status(201).send({ message: 'Order placed successfully', orders });
     } catch (error) {
-        console.log(error)
         res.status(500).send({ error: 'Error placing order', details: error.message });
     }
 };

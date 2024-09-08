@@ -40,6 +40,7 @@ import { applyCoupon } from "../controllers/sellers/applyCoupon.mjs";
 import { removeCoupon } from "../controllers/sellers/removeCoupon.mjs";
 import { applyCouponAndGetDiscount } from "../controllers/sellers/applyCouponAndGetDiscount.mjs";
 import { sendEmailToCustomer } from "../controllers/email-management/sendEmailToCustomer.mjs";
+import { abondonCarts } from "../controllers/sellers/abondonCarts.mjs";
 
 const route = Router()
 
@@ -95,5 +96,6 @@ route.post('/admin/coupons/delete', authenticateToken, isAdmin, removeCoupon)
 route.post('/apply-coupon', applyCouponAndGetDiscount)
 route.post('/admin/send-email', authenticateToken, isAdmin, sendEmailToCustomer)
 
+route.get('/abandoned-carts', authenticateToken, isAdmin, abondonCarts)
 
 export default route

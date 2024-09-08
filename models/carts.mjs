@@ -2,13 +2,12 @@ import mongoose from 'mongoose';
 
 const { Schema, model } = mongoose;
 
-// Schema definition
 const cartSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true,
-        index: true, // Index for quick lookup
+        index: true,
     },
     items: [
         {
@@ -16,11 +15,11 @@ const cartSchema = new Schema({
                 type: Schema.Types.ObjectId,
                 ref: 'Product',
                 required: true,
-                index: true, // Index for quick lookup
+                index: true,
             },
             size: {
                 type: String,
-                trim: true, // Remove any leading or trailing spaces
+                trim: true,
             },
             color: {
                 type: String,
@@ -30,13 +29,17 @@ const cartSchema = new Schema({
                 type: Number,
                 required: true,
                 min: 1,
-                default: 1, // Default value for better handling
+                default: 1,
             },
             price: {
                 type: Number,
                 required: true,
                 min: 0,
-                default: 0, // Default value for better handling
+                default: 0,
+            },
+            lastUpdated: {
+                type: Date,
+                default: Date.now,
             }
         }
     ],
@@ -47,7 +50,6 @@ const cartSchema = new Schema({
     }
 }, { timestamps: true });
 
-// Create model
 const Cart = model('Cart', cartSchema);
 
 export default Cart;

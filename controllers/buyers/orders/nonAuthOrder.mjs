@@ -11,7 +11,6 @@ export const nonAuthOrder = async (req, res) => {
     let { user: userId, body: { color, size, quantity, productId, shippingDetails: shippingAddress, totalAmount } } = req;
     const token = req.cookies.token || req.cookies._auth;
 
-    console.log("---------------IN HERE----------------")
     if (!totalAmount) {
         return res.sendStatus(400)
     }
@@ -123,7 +122,6 @@ export const nonAuthOrder = async (req, res) => {
         res.status(201).send({ message: 'Order placed successfully', order: newOrder });
 
     } catch (error) {
-        console.log(error)
         res.status(500).send({ error: 'Error placing order' });
     }
 };
