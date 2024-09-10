@@ -41,6 +41,8 @@ import { removeCoupon } from "../controllers/sellers/removeCoupon.mjs";
 import { applyCouponAndGetDiscount } from "../controllers/sellers/applyCouponAndGetDiscount.mjs";
 import { sendEmailToCustomer } from "../controllers/email-management/sendEmailToCustomer.mjs";
 import { abondonCarts } from "../controllers/sellers/abondonCarts.mjs";
+import { orderPerDayData, orderPerMonthData, orderPerWeekData, orderPerYearData } from "../controllers/analytics/TotalOrders.mjs";
+import { getTotal } from "../controllers/analytics/getTotal.mjs";
 
 const route = Router()
 
@@ -97,5 +99,12 @@ route.post('/apply-coupon', applyCouponAndGetDiscount)
 route.post('/admin/send-email', authenticateToken, isAdmin, sendEmailToCustomer)
 
 route.get('/abandoned-carts', authenticateToken, isAdmin, abondonCarts)
+
+route.get('/orders/day', orderPerDayData)
+route.get('/orders/week', orderPerWeekData)
+route.get('/orders/month', orderPerMonthData)
+route.get('/orders/year', orderPerYearData)
+
+route.get('/total/data', getTotal)
 
 export default route
