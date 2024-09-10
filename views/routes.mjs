@@ -31,7 +31,6 @@ import { getAllProducts, deleteProduct } from "../controllers/sellers/deleteProd
 import { editProduct } from "../controllers/sellers/editProduct.mjs";
 import { nonAuthOrder } from "../controllers/buyers/orders/nonAuthOrder.mjs";
 import { clearCart } from "../controllers/buyers/cart/clearCart.mjs";
-import { Analytics } from "../controllers/sellers/Analytics.mjs";
 import { Subscriber } from "../controllers/Subscriber.mjs";
 import { emailAutomate } from "../controllers/email-management/email.mjs";
 import { SubscribeToNewsLetter, UnsubscribeEndpoint } from "../controllers/email-management/SubscribeToNewsLetter.mjs";
@@ -86,7 +85,6 @@ route.get('/transaction/user', authenticateToken, getUserTransactions);
 route.get('/transaction/admin', authenticateToken, isAdmin, getAllTransactions);
 route.get('/admin/email', authenticateToken, isAdmin, getUserEmails)
 
-route.get('/api/orders/analytics', authenticateToken, isAdmin, Analytics)
 route.post('/make-admin', authenticateToken, Subscriber)
 
 route.post('/send/email', emailAutomate)
@@ -100,11 +98,10 @@ route.post('/admin/send-email', authenticateToken, isAdmin, sendEmailToCustomer)
 
 route.get('/abandoned-carts', authenticateToken, isAdmin, abondonCarts)
 
-route.get('/orders/day', orderPerDayData)
-route.get('/orders/week', orderPerWeekData)
-route.get('/orders/month', orderPerMonthData)
-route.get('/orders/year', orderPerYearData)
+route.get('/orders/day', authenticateToken, isAdmin, orderPerDayData)
+route.get('/orders/month', authenticateToken, isAdmin, orderPerMonthData)
+route.get('/orders/year', authenticateToken, isAdmin, orderPerYearData)
 
-route.get('/total/data', getTotal)
+route.get('/total/data', authenticateToken, isAdmin, getTotal)
 
 export default route
