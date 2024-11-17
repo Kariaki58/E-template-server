@@ -4,8 +4,8 @@ import User from "../../models/users.mjs";
 export const emailAutomate = async (req, res) => {
     const { subject, message, userEmail } = req.body;
 
-    if (!subject || !message || !userEmail) {
-        return res.status(400).send({ error: "Subject, message, and user email are required." });
+    if (!subject || !message || !userEmail || !phoneNumber || !name) {
+        return res.status(400).send({ error: "all field are required." });
     }
 
     if (typeof subject !== 'string') {
@@ -14,9 +14,12 @@ export const emailAutomate = async (req, res) => {
     if (typeof message !== 'string') {
         return res.status(400).send({ error: "message must be a string" })
     }
-    if (userEmail !== 'string') {
+    if (typeof userEmail !== 'string') {
         return res.status(400).send({ error: "user email must be a string" })
-    } 
+    }
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(userEmail)) {
+        return res.status(400).send({ error: "Invalid email format." });
+    }
 
     try {
         const findAdmin = await User.findOne({ isAdmin: true }).select('email -_id');

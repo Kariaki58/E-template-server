@@ -11,6 +11,9 @@ cloudinary.config({
   secure: true
 })
 
+export default cloudinary;
+
+
 // generateSignature use for cloudinary secure upload
 // folder - cloudinary folder name
 

@@ -1,5 +1,6 @@
 import Address from "../models/address.mjs";
 
+
 export const getAddress = async (req, res) => {
     try {
         // Ensure userId is available

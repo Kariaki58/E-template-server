@@ -19,6 +19,10 @@ const reviewSchema = new Schema({
         min: 1, // Minimum rating
         max: 5  // Maximum rating
     },
+    name: {
+        type: String,
+        required: true,
+    },
     comment: {
         type: String,
         required: true,

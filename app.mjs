@@ -4,9 +4,9 @@ import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import ExpressMongoSanitize from 'express-mongo-sanitize';
-import helmet from 'helmet';  // Security headers
-import compression from 'compression';  // Response compression
-import rateLimit from 'express-rate-limit';  // Rate limiting
+import helmet from 'helmet';
+import compression from 'compression';
+import rateLimit from 'express-rate-limit';
 import routes from './views/routes.mjs';
 
 dotenv.config();
@@ -62,6 +62,7 @@ mongoose
   })
   .then(() => {
     app.listen(process.env.PORT, () => {
+      console.log("running...")
     });
   })
   .catch(err => {

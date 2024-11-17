@@ -39,9 +39,10 @@ import { applyCoupon } from "../controllers/sellers/applyCoupon.mjs";
 import { removeCoupon } from "../controllers/sellers/removeCoupon.mjs";
 import { applyCouponAndGetDiscount } from "../controllers/sellers/applyCouponAndGetDiscount.mjs";
 import { sendEmailToCustomer } from "../controllers/email-management/sendEmailToCustomer.mjs";
-import { abondonCarts } from "../controllers/sellers/abondonCarts.mjs";
 import { orderPerDayData, orderPerMonthData, orderPerWeekData, orderPerYearData } from "../controllers/analytics/TotalOrders.mjs";
 import { getTotal } from "../controllers/analytics/getTotal.mjs";
+import { getAdminContent, getSettings, getAppLayout } from "../controllers/sellers/Content.mjs";
+
 
 const route = Router()
 
@@ -96,12 +97,14 @@ route.post('/admin/coupons/delete', authenticateToken, isAdmin, removeCoupon)
 route.post('/apply-coupon', applyCouponAndGetDiscount)
 route.post('/admin/send-email', authenticateToken, isAdmin, sendEmailToCustomer)
 
-route.get('/abandoned-carts', authenticateToken, isAdmin, abondonCarts)
-
 route.get('/orders/day', authenticateToken, isAdmin, orderPerDayData)
 route.get('/orders/month', authenticateToken, isAdmin, orderPerMonthData)
 route.get('/orders/year', authenticateToken, isAdmin, orderPerYearData)
 
 route.get('/total/data', authenticateToken, isAdmin, getTotal)
+
+route.post('/admin/content', authenticateToken, isAdmin, getAdminContent)
+route.get('/admin/content', authenticateToken, isAdmin, getSettings)
+route.get('/admin/layout', getAppLayout)
 
 export default route

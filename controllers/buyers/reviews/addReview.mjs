@@ -2,7 +2,7 @@ import Review from "../../../models/reviews.mjs";
 
 export const addReview = async (req, res) => {
     try {
-        const { body: { productId, rating, comment, imageUrl: reviewImage } } = req;
+        const { body: { productId, rating, name, comment, imageUrl: reviewImage } } = req;
         const userId = req.user;
 
         // Validate input
@@ -15,6 +15,9 @@ export const addReview = async (req, res) => {
         if (!comment) {
             return res.status(400).send({ error: "Please add a comment" });
         }
+        if (!name) {
+            return res.status(400).send({ error: "Please provide your name" });
+        }
 
         // Check if the user has already reviewed this product
         const existingReview = await Review.findOne({ userId, productId }).lean();
@@ -24,7 +27,7 @@ export const addReview = async (req, res) => {
 
         // Create and save the new review
         const newReview = new Review({
-            userId, productId, rating, comment, reviewImage
+            userId, productId, rating, comment, reviewImage, name
         });
         await newReview.save();
 
