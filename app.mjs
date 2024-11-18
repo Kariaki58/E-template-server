@@ -55,9 +55,7 @@ app.use((req, res, next) => {
 
 // Use routes
 app.use(routes);
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+
 
 mongoose
   .connect(process.env.CONNECT_MONGO, {
