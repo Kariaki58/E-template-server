@@ -54,8 +54,8 @@ export const login = async (req, res) => {
                     })
                 });
                 findUserCart.totalPrice += calTotalPrice
+                await findUserCart.save()
             }
-            await findUserCart.save()
         }
         
         // Set cookie
@@ -70,6 +70,7 @@ export const login = async (req, res) => {
         return res.json({ message: 'User login successful', token, isAdmin });
 
     } catch (error) {
+        console.log(error)
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
