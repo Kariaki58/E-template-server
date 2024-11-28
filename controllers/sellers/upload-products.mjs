@@ -1,5 +1,6 @@
 import Product from "../../models/products.mjs";
 import Faq from "../../models/faq.mjs";
+import {removeFromCloudinary} from "../../utils/cloudinary.mjs";
 
 
 // Utility function to validate arrays
@@ -18,96 +19,70 @@ const validateFaqItems = (faqItems) => {
 };
 
 export const uploadProducts = async (req, res) => {
-  const {
-    productName: name,
-    description,
-    gender,
-    size: sizes,
-    color: colors,
-    price,
-    stock,
-    images,
-    materials,
-    features,
-    category,
-    faqItems
-  } = req.body;
+  const { productName, description, size: sizes, color: colors, price, stock, category, faqItems } = req.body;
 
-  if (faqItems) {
-    if (!validateFaqItems(faqItems)) {
-      return res.status(400).send({ error: "invalid request body" })
-    }
+  const images = req.files?.map(file => ({
+    url: file.path,
+    public_id: file.filename,
+  })) || [];
+
+
+  if (!Array.isArray(images) || images.length < 1) {
+    return res.status(400).json({ error: "At least one image must be uploaded" });
   }
-  
+
   try {
-    // Input validation
-    if (!name || !description || !price || !stock || !images || !category || images.length === 0) {
-      return res.status(400).send({ error: "Name, description, price, stock, images, and category are required" });
+    if (!productName) throw new Error("Name is required");
+    if (!description) throw new Error("Description is required");
+    if (description.length < 20) throw new Error("Detailed description is required");
+    
+    if (sizes && sizes.length > 0 && !validateArray(sizes, "string")) {
+      throw new Error("Sizes must be an array of strings");
+    }
+    if (colors && colors.length > 0 && !validateArray(colors, "string")) {
+      throw new Error("Colors must be an array of strings");
+    }
+    
+    if (!price || isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
+      throw new Error("Price must be a valid number greater than 0");
     }
 
-    if (typeof name !== 'string' || typeof description !== 'string') {
-      return res.status(400).send({ error: "Name and description must be strings" });
+    if (!stock || isNaN(parseInt(stock)) || parseInt(stock) < 0) {
+      throw new Error("Stock must be a valid integer greater than 0");
+    }
+    
+    if (!category || typeof category !== "string") {
+      throw new Error("Category must be a string");
     }
 
-    if (typeof price !== 'number' || price <= 0) {
-      return res.status(400).send({ error: "Price must be a positive number" });
+    if (faqItems && faqItems.length > 0 && !validateFaqItems(faqItems)) {
+      throw new Error("Please check your FAQ items");
     }
 
-    if (typeof stock !== 'number' || stock < 0) {
-      return res.status(400).send({ error: "Stock must be a non-negative number" });
-    }
-
-    if (!validateArray(images, 'string')) {
-      return res.status(400).send({ error: "Images must be an array of strings" });
-    }
-
-    if (typeof category !== 'string') {
-      return res.status(400).send({ error: "Category must be a string" });
-    }
-
-    if (gender && typeof gender !== 'string') {
-      return res.status(400).send({ error: "Gender must be a string" });
-    }
-
-    if (sizes && !validateArray(sizes, 'string')) {
-      return res.status(400).send({ error: "Sizes must be an array of strings" });
-    }
-
-    if (colors && !validateArray(colors, 'string')) {
-      return res.status(400).send({ error: "Colors must be an array of strings" });
-    }
-
-    if (materials && !validateArray(materials, 'string')) {
-      return res.status(400).send({ error: "Materials must be an array of strings" });
-    }
-
-    if (features && !validateArray(features, 'string')) {
-      return res.status(400).send({ error: "Features must be an array of strings" });
-    }
-
-    // Create and save product
     const product = new Product({
-      name,
+      name: productName,
       description,
-      gender,
       sizes,
       colors,
       price,
       stock,
-      images,
-      materials,
-      features,
-      category
+      category,
+      images: images.map(image => image.url),
     });
 
     await product.save();
 
-    const productFaq = new Faq({ faq: faqItems, productId: product.id })
+    try {
+      const productFaq = new Faq({ faq: faqItems, productId: product.id });
+      await productFaq.save();
+    } catch (faqError) {
+      await Product.findByIdAndDelete(product.id);
+      throw new Error("Error saving FAQ. Product upload rolled back.");
+    }
 
-    await productFaq.save()
-
-    res.status(201).send({ message: "Product uploaded successfully", product });
+    res.status(201).json({ message: "Product uploaded successfully" });
   } catch (err) {
-    res.status(500).send({ error: "Server error, please contact staff" });
+    await Promise.all(images.map(image => removeFromCloudinary(image.url)));
+    res.status(500).json({ error: err.message || "Server error, please contact staff" });
   }
 };

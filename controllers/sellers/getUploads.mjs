@@ -32,8 +32,6 @@ export const getUploads = async (req, res) => {
         const products = await Product.find({})
             .skip((pageNum - 1) * limitNum)
             .limit(limitNum)
-        
-
         const total = await Product.countDocuments();
         return res.status(200).send({
             message: products,

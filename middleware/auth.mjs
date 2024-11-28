@@ -16,12 +16,12 @@ export const generateToken = (_id) => {
 export const authenticateToken = async (req, res, next) => {
     try {
         // Get token from cookies
-        const token = req.cookies.token || req.cookies._auth;
+        let token = req.cookies.token || req.cookies._auth;
+
         // Check if token is present
         if (!token) {
-            return res.status(401).json({ error: 'Authentication token is missing' });
+            return res.status(401).json({ error: 'Authentication Error' });
         }
-
         // Verify token
         jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
             if (err) {
@@ -33,6 +33,7 @@ export const authenticateToken = async (req, res, next) => {
             next();
         });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ error: 'Internal server error' });
     }
 };

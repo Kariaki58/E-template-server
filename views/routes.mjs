@@ -1,4 +1,5 @@
 import Router from "router";
+import Product from "../models/products.mjs"
 import { register } from "../controllers/authentication/register.mjs";
 import { login } from "../controllers/authentication/login.mjs";
 import { authenticateToken } from "../middleware/auth.mjs";
@@ -18,9 +19,9 @@ import { getProductReview } from "../controllers/buyers/reviews/getReview.mjs";
 import { addReview } from "../controllers/buyers/reviews/addReview.mjs";
 import { editReview } from "../controllers/buyers/reviews/editReview.mjs";
 import { removeReview } from "../controllers/buyers/reviews/removeReview.mjs";
-import { generateSignature } from "../utils/cloudinary.mjs";
 import { productPage } from "../controllers/productPage.mjs";
 import { getAddress } from "../controllers/getAddress.mjs";
+import { generateSignature } from "../utils/cloudinary.mjs";
 import { addTransaction } from '../controllers/sellers/transactions.mjs';
 import { getUserOrders, getAllOrders } from "../controllers/buyers/orders/addOrder.mjs";
 import { getUserTransactions, getAllTransactions } from "../controllers/sellers/transactions.mjs";
@@ -41,7 +42,9 @@ import { applyCouponAndGetDiscount } from "../controllers/sellers/applyCouponAnd
 import { sendEmailToCustomer } from "../controllers/email-management/sendEmailToCustomer.mjs";
 import { orderPerDayData, orderPerMonthData, orderPerWeekData, orderPerYearData } from "../controllers/analytics/TotalOrders.mjs";
 import { getTotal } from "../controllers/analytics/getTotal.mjs";
+import { upload } from "../utils/cloudinary.mjs";
 import { getAdminContent, getSettings, getAppLayout } from "../controllers/sellers/Content.mjs";
+import { removeFromCloudinary } from "../utils/cloudinary.mjs";
 
 
 const route = Router()
@@ -55,7 +58,7 @@ route.post('/signout', signout)
 route.get('/admin/products', authenticateToken, isAdmin, getAllProducts)
 route.put('/admin/product/edit', authenticateToken, isAdmin, editProduct);
 route.delete('/admin/product/:productId', authenticateToken, isAdmin, deleteProduct);
-route.post('/upload/add', authenticateToken, isAdmin, uploadProducts)
+route.post('/upload/add', authenticateToken, isAdmin, upload.array('images'), uploadProducts)
 
 route.get('/cart', authenticateToken, getUserCart)
 route.post('/cart/add', authenticateToken, addToCart)
@@ -63,13 +66,13 @@ route.put('/cart/edit', authenticateToken, editCart)
 route.patch('/cart/increment', authenticateToken, incrementCart)
 route.patch('/cart/decrement', authenticateToken, decrementCart)
 route.delete('/delete/cart/:pos/:cid', authenticateToken, removeFromCart)
+route.post('/api/gensignature', authenticateToken, isAdmin, generateSignature)
 route.post('/address/add', addAddress)
 route.get('/address', authenticateToken, getAddress)
 route.get('/review/get/:pid', getProductReview)
 route.post('/review/add', authenticateToken, addReview)
 route.put('/review/edit', authenticateToken, editReview)
 route.delete('/review/delete', authenticateToken, removeReview)
-route.post('/api/gensignature', authenticateToken, isAdmin, generateSignature)
 route.get('/products/:id', productPage)
 route.post('/order/place', nonAuthOrder)
 
@@ -106,5 +109,53 @@ route.get('/total/data', authenticateToken, isAdmin, getTotal)
 route.post('/admin/content', authenticateToken, isAdmin, getAdminContent)
 route.get('/admin/content', authenticateToken, isAdmin, getSettings)
 route.get('/admin/layout', getAppLayout)
+
+route.delete('/admin/:productId/delete', authenticateToken, isAdmin, async (req, res) => {
+    const { imageUrl } = req.query;
+    const { productId } = req.params;
+
+    if (!productId) {
+        return res.status(400).send({ error: "Product ID is required" });
+    }
+
+    if (!imageUrl) {
+        return res.status(400).send({ error: "Image URL is required" });
+    }
+
+    console.log({imageUrl})
+    console.log({productId})
+
+    try {
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).send({ error: "Product not found" });
+        }
+
+        // Filter out the image to be removed
+        const updatedImages = product.images.filter(img => img !== imageUrl);
+
+        // Update the product's images array
+        const response = await Product.findByIdAndUpdate(
+            productId,
+            { images: updatedImages },
+            { new: true }
+        );
+
+        console.log({response})
+
+        // Call Cloudinary to remove the image
+        const result = await removeFromCloudinary(imageUrl);
+        if (result.result !== 'ok') {
+            return res.status(500).send({ error: "Failed to remove image from Cloudinary" });
+        }
+        
+
+        return res.status(200).send({ message: "Image removed successfully", product });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ error: "Internal Server Error" });
+    }
+});
+
 
 export default route
