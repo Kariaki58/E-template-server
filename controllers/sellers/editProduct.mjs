@@ -21,7 +21,6 @@ export const editProduct = async (req, res) => {
             category
         } = req.body;
 
-        console.log(req.body)
 
         // Early return if required fields are missing
         if (!productId) return res.status(400).json({ error: "Product ID is required" });
