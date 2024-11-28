@@ -8,7 +8,7 @@ export const editProduct = async (req, res) => {
             name,
             description,
             gender,
-            percent,
+            percentOff,
             sizes,
             colors,
             price,
@@ -20,6 +20,8 @@ export const editProduct = async (req, res) => {
             rating,
             category
         } = req.body;
+
+        console.log(req.body)
 
         // Early return if required fields are missing
         if (!productId) return res.status(400).json({ error: "Product ID is required" });
@@ -58,15 +60,8 @@ export const editProduct = async (req, res) => {
             }
         }
 
-        if (percent) {
-            try {
-                percent = Number(percent)
-            } catch (err) {
-                return res.status(400).send({ error: "percent must be an integer" })
-            }
-            if (typeof percent !== 'number' || percent < 0 || percent > 100) {
-                return res.status(400).json({ error: "PercentOff must be a number between 0 and 100" });
-            }
+        if (isNaN(parseInt(percentOff))) {
+            return res.status(400).send({ error: "percent must be an integer" })
         }
 
         // Batch update in a single MongoDB operation
@@ -77,7 +72,7 @@ export const editProduct = async (req, res) => {
                     name,
                     description,
                     gender,
-                    percentOff: percent,
+                    percentOff: parseInt(percentOff),
                     sizes,
                     colors,
                     price: parsedPrice,
