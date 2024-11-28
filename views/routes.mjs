@@ -122,9 +122,6 @@ route.delete('/admin/:productId/delete', authenticateToken, isAdmin, async (req,
         return res.status(400).send({ error: "Image URL is required" });
     }
 
-    console.log({imageUrl})
-    console.log({productId})
-
     try {
         const product = await Product.findById(productId);
         if (!product) {
@@ -132,30 +129,34 @@ route.delete('/admin/:productId/delete', authenticateToken, isAdmin, async (req,
         }
 
         // Filter out the image to be removed
-        const updatedImages = product.images.filter(img => img !== imageUrl);
+        const updatedImages = product.images.filter(img => img.trim() !== imageUrl.trim());
 
-        // Update the product's images array
-        const response = await Product.findByIdAndUpdate(
+
+
+        // Update the product's images array in MongoDB
+        const updatedProduct = await Product.findByIdAndUpdate(
             productId,
             { images: updatedImages },
             { new: true }
         );
 
-        console.log({response})
+        if (!updatedProduct) {
+            return res.status(500).send({ error: "Failed to update product images" });
+        }
 
         // Call Cloudinary to remove the image
         const result = await removeFromCloudinary(imageUrl);
         if (result.result !== 'ok') {
             return res.status(500).send({ error: "Failed to remove image from Cloudinary" });
         }
-        
 
-        return res.status(200).send({ message: "Image removed successfully", product });
+        return res.status(200).send({ message: "Image removed successfully", product: updatedProduct });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ error: "Internal Server Error" });
     }
 });
+
 
 
 export default route
