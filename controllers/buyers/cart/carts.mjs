@@ -13,8 +13,6 @@ export const getUserCart = async (req, res) => {
         if (!userCart) {
             return res.status(200).json({ message: "cart retrieved", cart: [] });
         }
-
-
         return res.status(200).json({ message: "Cart retrieved successfully", cart: userCart });
     } catch (err) {
         return res.status(500).json({ error: "Internal server error. Please try again later." });

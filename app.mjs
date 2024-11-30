@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 
 // Middleware setup
-app.use(express.json({ limit: '100kb' }));  // Limit request body size to prevent attacks
+app.use(express.json({ limit: '20MB' }));  // Limit request body size to prevent attacks
 app.use(ExpressMongoSanitize());
 app.use(cookieParser());
 app.use(compression());  // Compress responses
@@ -65,7 +65,6 @@ mongoose
   })
   .then(() => {
     app.listen(process.env.PORT, () => {
-      
     });
   })
   .catch(err => {
