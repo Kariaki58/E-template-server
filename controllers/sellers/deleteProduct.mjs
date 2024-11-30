@@ -76,14 +76,14 @@ export const deleteProduct = async (req, res) => {
 
       // Remove the product from carts and orders in parallel
       await Promise.all([
-        Cart.updateMany(
-            { 'items.productId': productId },
-            { $pull: { items: { productId: productId } } }
-        ),
-        Order.updateMany(
-            { 'cartId.items.productId': productId },
-            { $pull: { 'cartId.items': { productId: productId } } }
-        )
+          Cart.updateMany(
+              { 'items.productId': productId },
+              { $pull: { items: { productId: productId } } }
+          ),
+          Order.updateMany(
+              { 'cartId.items.productId': productId },
+              { $pull: { 'cartId.items': { productId: productId } } }
+          )
       ]);
 
       res.status(200).json({ message: "Product and its references deleted successfully" });

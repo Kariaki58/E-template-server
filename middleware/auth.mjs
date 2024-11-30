@@ -20,12 +20,12 @@ export const authenticateToken = async (req, res, next) => {
 
         // Check if token is present
         if (!token) {
-            return res.status(401).json({ error: 'Authentication Error' });
+            return res.status(401).json({ error: 'Access Denied' });
         }
         // Verify token
         jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
             if (err) {
-                return res.status(403).json({ error: 'Invalid or expired token' });
+                return res.status(403).json({ error: 'Access Denied' });
             }
 
             // Attach user ID to the request

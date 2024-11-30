@@ -18,7 +18,7 @@ export const isAdmin = async (req, res, next) => {
         const verifyAdmin = await User.findById(user).select('isAdmin').exec();
 
         if (!verifyAdmin || !verifyAdmin.isAdmin) {
-            return res.status(403).json({ error: "Unauthorized operation" });
+            return res.status(403).json({ error: "Access Denied" });
         }
 
         next();
