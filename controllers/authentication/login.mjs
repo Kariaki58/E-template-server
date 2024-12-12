@@ -63,7 +63,8 @@ export const login = async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: 'None',
-            maxAge: 2592000000
+            maxAge: 2592000000,
+            domain: 'e-template-server.onrender.com'
         });
 
         // Send response
