@@ -64,7 +64,7 @@ export const login = async (req, res) => {
             secure: true,
             sameSite: 'None',
             maxAge: 2592000000,
-            domain: 'e-template-server.onrender.com'
+            domain: '.poshwears.ng'
         });
 
         // Send response
