@@ -57,15 +57,7 @@ export const login = async (req, res) => {
                 await findUserCart.save()
             }
         }
-        
-        // Set cookie
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-            maxAge: 2592000000,
-            domain: '.e-template-server.onrender.com'
-        });
+
 
         // Send response
         return res.json({ message: 'User login successful', token, isAdmin });

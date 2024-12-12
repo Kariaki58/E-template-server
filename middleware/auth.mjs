@@ -16,7 +16,9 @@ export const generateToken = (_id) => {
 export const authenticateToken = async (req, res, next) => {
     try {
         // Get token from cookies
-        let token = req.cookies.token || req.cookies._auth;
+        let authHeader = req.headers['authorization'] || req.headers['Authorization'];
+
+        let token = authHeader.split(' ')[1];
 
         // Check if token is present
         if (!token) {

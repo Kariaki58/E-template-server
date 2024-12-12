@@ -80,14 +80,6 @@ export const register = async (req, res) => {
 
         const token = generateToken(newUser._id);
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-            maxAge: 2592000000, // 30 days
-            domain: '.e-template-server.onrender.com'
-        });
-
         return res.status(201).json({ message: 'User registered successfully', token });
     } catch (error) {
         return res.status(500).json({ error: 'Internal server error' });
