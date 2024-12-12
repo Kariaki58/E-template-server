@@ -85,7 +85,7 @@ export const register = async (req, res) => {
             secure: true,
             sameSite: 'None',
             maxAge: 2592000000, // 30 days
-            domain: '.poshwears.ng'
+            domain: '.e-template-server.onrender.com'
         });
 
         return res.status(201).json({ message: 'User registered successfully', token });
