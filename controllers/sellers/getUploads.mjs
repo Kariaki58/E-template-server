@@ -1,45 +1,63 @@
 import Product from "../../models/products.mjs";
-
+import Category from "../../models/categories.mjs";
 
 export const getUploads = async (req, res) => {
-    let { page = 1, limit = 10 } = req.query;
-    
+    let { page = 1, limit = 10, category = "", search = "", sort = "" } = req.query;
+
     try {
-        page = Number(page)
+        page = parseInt(page, 10);
+        limit = parseInt(limit, 10);
+
+        if (!Number.isInteger(page) || page < 1 || !Number.isInteger(limit) || limit < 1) {
+            return res.status(400).json({ error: "Page and limit must be positive integers" });
+        }
     } catch (error) {
-        return res.status(400).send({ error: "page must be a number" })
+        return res.status(400).json({ error: "Invalid pagination parameters" });
     }
 
     try {
-        limit = Number(limit)
-    } catch (error) {
-        return res.status(400).send({ error: "limit must be a number" })
-    }
+        const filters = {};
 
-    if (!Number.isInteger(page) || !Number.isInteger(limit)) {
-        return res.status(400).send({ error: "page and limit must be an integer" })
-    }
+        if (search) {
+            filters.name = { $regex: search, $options: "i" };
+        }
 
-    // Validate page and limit parameters
-    const pageNum = parseInt(page, 10);
-    const limitNum = parseInt(limit, 10);
-    if (isNaN(pageNum) || pageNum < 1 || isNaN(limitNum) || limitNum < 1) {
-        return res.status(400).send({ error: "Invalid pagination parameters" });
-    }
+        if (category) {
+            console.log(category)
+            const categoryData = await Category.findOne({ name: category.replace("-", " ") }).lean();
+            console.log({ categoryData })
+            if (categoryData) {
+                console.log(categoryData)
+                filters.category = categoryData.name;
+            }
+        }
 
-    try {
-        // Fetch paginated products with selected fields
-        const products = await Product.find({})
-            .skip((pageNum - 1) * limitNum)
-            .limit(limitNum)
-        const total = await Product.countDocuments();
-        return res.status(200).send({
-            message: products,
+        const sortOptions = {};
+        if (sort === "High to Low") {
+            sortOptions.price = -1;
+        } else if (sort === "Low to High") {
+            sortOptions.price = 1;
+        } else if (sort === "Rating") {
+            sortOptions["reviews.rating"] = -1;
+        }
+
+        const products = await Product.find(filters)
+            .select("name price category reviews") // Fetch only necessary fields
+            .sort(sortOptions)
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean(); // Improves performance by returning plain JS objects
+
+        const total = await Product.countDocuments(filters);
+
+        return res.status(200).json({
+            products,
             total,
-            page: pageNum,
-            limit: limitNum
+            page,
+            limit
         });
     } catch (err) {
-        return res.status(500).send({ error: "Server error, please contact staff" });
+        console.error("Error fetching products:", err);
+        return res.status(500).json({ error: "Server error, please contact staff" });
     }
 };
