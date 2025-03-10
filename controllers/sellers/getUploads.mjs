@@ -39,6 +39,8 @@ export const getUploads = async (req, res) => {
             sortOptions.price = 1;
         } else if (sort === "Rating") {
             sortOptions["reviews.rating"] = -1;
+        } else if (sort === "Latest") {
+            sortOptions.createdAt = -1;
         }
 
         const products = await Product.find(filters)
