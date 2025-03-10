@@ -45,6 +45,7 @@ import { getTotal } from "../controllers/analytics/getTotal.mjs";
 import { upload } from "../utils/cloudinary.mjs";
 import { getAdminContent, getSettings, getAppLayout } from "../controllers/sellers/Content.mjs";
 import { removeFromCloudinary } from "../utils/cloudinary.mjs";
+import { getAllCategory } from "../controllers/getAllCategory.mjs";
 
 
 const route = Router()
@@ -59,6 +60,7 @@ route.get('/admin/products', authenticateToken, isAdmin, getAllProducts)
 route.put('/admin/product/edit', authenticateToken, isAdmin, editProduct);
 route.delete('/admin/product/:productId', authenticateToken, isAdmin, deleteProduct);
 route.post('/upload/add', authenticateToken, isAdmin, upload.array('images'), uploadProducts)
+route.get("/category", getAllCategory)
 
 route.get('/cart', authenticateToken, getUserCart)
 route.post('/cart/add', authenticateToken, addToCart)

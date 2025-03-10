@@ -1,4 +1,5 @@
 import Product from "../../models/products.mjs";
+import Category from "../../models/categories.mjs";
 import Faq from "../../models/faq.mjs";
 import {removeFromCloudinary} from "../../utils/cloudinary.mjs";
 
@@ -59,6 +60,12 @@ export const uploadProducts = async (req, res) => {
       throw new Error("Please check your FAQ items");
     }
 
+    let existingCategory = await Category.findOne({ name: category });
+    if (!existingCategory) {
+      existingCategory = await Category.create({ name: category });
+    }
+
+
     const product = new Product({
       name: productName,
       description,
@@ -66,9 +73,11 @@ export const uploadProducts = async (req, res) => {
       colors,
       price,
       stock,
-      category,
+      category: existingCategory.name,
       images: images.map(image => image.url),
     });
+
+    
 
     await product.save();
 
