@@ -44,7 +44,6 @@ export const getUploads = async (req, res) => {
         }
 
         const products = await Product.find(filters)
-            .select("name price category reviews") // Fetch only necessary fields
             .sort(sortOptions)
             .skip((page - 1) * limit)
             .limit(limit)
