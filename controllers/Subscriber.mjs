@@ -4,13 +4,15 @@ import { createTransport } from 'nodemailer';
 
 export const sendEmail = async (email, subject, receiver, template) => {
     try {
+        console.log({ email, subject, receiver, template })
         const transporter = createTransport({
             service: process.env.SERVICE,
             auth: {
-                user: process.env.ADDRESS,
+                user: process.env.EMAIL_SERVER_USER,
                 pass: process.env.PASS
             }
         });
+        console.log("LINE 15")
 
         const mailOptions = {
             from: email,
@@ -20,8 +22,10 @@ export const sendEmail = async (email, subject, receiver, template) => {
         };
 
         await transporter.sendMail(mailOptions);
+        console.log("LINE 25")
         return null;
     } catch (error) {
+        console.log(error)
         return { error: 'An error occurred while sending the email. Please try again later.' };
     }
 };

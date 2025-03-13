@@ -386,10 +386,6 @@ export const trackEmailTemplate = (name, orderId, status) => `
         <div class="content">
             <p>Hi ${name},</p>
             <p>We wanted to let you know that the status of your order (ID: ${orderId}) has been updated to: <strong>${status}</strong>.</p>
-
-            <p>You can track your order and view additional details by clicking the button below:</p>
-
-            <a href="${process.env.FRONTEND}/track-order/${orderId}" class="button">Track Your Order</a>
         </div>
 
         <div class="footer">
