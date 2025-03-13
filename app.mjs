@@ -51,16 +51,6 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Prevent XSS attacks
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', allowedOrigins);
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('X-XSS-Protection', '1; mode=block');
-  res.header('X-Content-Type-Options', 'nosniff');
-  res.header('Referrer-Policy', 'no-referrer');
-  next();
-});
 
 // Use routes
 app.use(routes);
