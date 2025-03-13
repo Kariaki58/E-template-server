@@ -21,7 +21,7 @@ app.use(compression());  // Compress responses
 app.use(helmet());  // Set security-related HTTP response headers
 
 // CORS configuration
-const allowedOrigins = process.env.FRONTEND
+const allowedOrigins = true
 const corsOptions = {
   origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
