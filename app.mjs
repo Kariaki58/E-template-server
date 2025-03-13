@@ -21,12 +21,18 @@ app.use(compression());  // Compress responses
 app.use(helmet());  // Set security-related HTTP response headers
 
 // CORS configuration
-const allowedOrigins = true
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    if (!origin) {
+      callback(null, true);
+    } else {
+      callback(null, origin);
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  credentials: true,
+  credentials: true, // Required for cookies/auth headers
 };
+
 app.use(cors(corsOptions));
 
 app.set('trust proxy', 1);
@@ -65,6 +71,7 @@ mongoose
   })
   .then(() => {
     app.listen(process.env.PORT, () => {
+      console.log(`Server running on port ${process.env.PORT}`);
     });
   })
   .catch(err => {
