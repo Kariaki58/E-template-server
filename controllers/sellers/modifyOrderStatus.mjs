@@ -11,7 +11,7 @@ export const modifyOrderStatus = async (req, res) => {
         return res.status(400).send({ error: "order id is required" })
     }
     if (!status) {
-        return res.status(400).send({ erro: "status is required" })
+        return res.status(400).send({ error: "status is required" })
     }
     if (typeof status !== 'string') {
         return res.status(400).send({ error: "status must be a string" })
