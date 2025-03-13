@@ -1,4 +1,4 @@
-export const generateEmailTemplate = (name, email) => `
+export const generateEmailTemplate = (name, email, listOfOrderId) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,8 +84,8 @@ export const generateEmailTemplate = (name, email) => `
         <div class="content">
             <h2>Hi ${name},</h2>
             <p>Thank you for shopping with us! We are excited to let you know that we’ve received your order and it’s now being processed.</p>
-
-            <p>We will notify you once your order has been shipped. You can track your order status through our website by logging into your account.</p>
+            <p>Your order number is: ${listOfOrderId.join(', ')}</p>
+            <p>We will send you a confirmation email once your order has been shipped. You can track your order status through our website by using the tracking with your orderIds.</p>
             <p>If you have any questions or need further assistance, feel free to reply to this email or contact our customer support team at <a href="mailto:${email}">${email}</a>.</p>
 
             <a href=${process.env.FRONTEND} class="button">Visit Our Store</a>

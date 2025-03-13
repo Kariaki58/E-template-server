@@ -60,6 +60,7 @@ export const addNonAuthOrder = async (req, res) => {
         );
 
         await addressDoc.save();
+        const listOfOrderId = []
 
         // Save each order from the cart
         for (const item of cart) {
@@ -72,9 +73,11 @@ export const addNonAuthOrder = async (req, res) => {
                 price: Number(totalAmount)/100
             });
             await addOrder.save();
+            listOfOrderId.push(addOrder._id)
         }
+        
 
-        const template = generateEmailTemplate(shippingDetails.name, process.env.ADDRESS)
+        const template = generateEmailTemplate(shippingDetails.name, process.env.ADDRESS, listOfOrderId)
         const subjectLine = "Thank You for Your Order! 🎉";
         const result = await sendEmail(process.env.ADDRESS, subjectLine, shippingDetails.email, template)
 
