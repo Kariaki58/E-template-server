@@ -23,11 +23,8 @@ export const getUploads = async (req, res) => {
         }
 
         if (category) {
-            console.log(category)
             const categoryData = await Category.findOne({ name: category.replace("-", " ") }).lean();
-            console.log({ categoryData })
             if (categoryData) {
-                console.log(categoryData)
                 filters.category = categoryData.name;
             }
         }

@@ -32,14 +32,15 @@ export const addNonAuthOrder = async (req, res) => {
     // Validate each item in the cart
     for (const item of cart) {
         if (
-            !item.color || typeof item.color !== 'string' ||
-            !item.size || typeof item.size !== 'string' ||
-            !item.quantity || typeof item.quantity !== 'number' ||
-            !item.price || typeof item.price !== 'number'
+            (item.colors && typeof item.colors !== 'string') ||
+            (item.sizes && typeof item.sizes !== 'string') ||  
+            typeof item.quantity !== 'number' || item.quantity <= 0 ||
+            typeof item.price !== 'number' || item.price <= 0
         ) {
-            return res.status(400).send({ error: "Each cart item must have valid color, size, quantity, and price" });
+            return res.status(400).send({ error: "Each cart item must have a valid (optional) color, (optional) size, quantity, and price." });
         }
     }
+    
 
     try {
         // Create or update the address in the database
@@ -63,9 +64,9 @@ export const addNonAuthOrder = async (req, res) => {
         // Save each order from the cart
         for (const item of cart) {
             const addOrder = new Order({
-                productName: item.productId.name,
-                color: item.color,
-                size: item.size,
+                productName: item.name,
+                color: item.colors,
+                size: item.sizes,
                 quantity: item.quantity,
                 shippingAddress: addressDoc._id,
                 price: Number(totalAmount)/100
