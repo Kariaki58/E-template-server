@@ -114,6 +114,11 @@ route.post('/admin/content', authenticateToken, isAdmin, getAdminContent)
 route.get('/admin/content', authenticateToken, isAdmin, getSettings)
 route.get('/admin/layout', getAppLayout)
 
+route.get("/api/all", async (req, res) => {
+    const products = await Product.find({});
+    res.send(products);
+})
+
 route.delete('/admin/:productId/delete', authenticateToken, isAdmin, async (req, res) => {
     const { imageUrl } = req.query;
     const { productId } = req.params;
