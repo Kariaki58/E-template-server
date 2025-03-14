@@ -77,7 +77,7 @@ route.get('/review/get/:pid', getProductReview)
 route.post('/review/add', authenticateToken, addReview)
 route.put('/review/edit', authenticateToken, editReview)
 route.delete('/review/delete', authenticateToken, removeReview)
-route.get('/products/:id', productPage)
+route.get('/products/:slug', productPage)
 route.post('/order/place', nonAuthOrder)
 
 route.post('/order', authenticateToken, addOrder);
@@ -156,7 +156,6 @@ route.delete('/admin/:productId/delete', authenticateToken, isAdmin, async (req,
 
         return res.status(200).send({ message: "Image removed successfully", product: updatedProduct });
     } catch (error) {
-        console.error(error);
         return res.status(500).send({ error: "Internal Server Error" });
     }
 });

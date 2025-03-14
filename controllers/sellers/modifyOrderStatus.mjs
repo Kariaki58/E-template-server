@@ -83,7 +83,6 @@ export const modifyOrderStatus = async (req, res) => {
                 updatedOrder.shippingAddress.email, 
                 trackOrderEmailTemplate
             );
-            console.log(trackOrderEmail)
 
             if (trackOrderEmail && trackOrderEmail.error) {
                 return res.status(400).send({ error: "Could not send tracking email to customer, contact the developer" });

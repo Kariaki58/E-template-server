@@ -31,7 +31,6 @@ export const UnsubscribeEndpoint = async (req, res) => {
 
         return res.send('You have successfully unsubscribed from our mailing list.');
     } catch (error) {
-        console.error('Error unsubscribing:', error);
         return res.status(500).send('An error occurred. Please try again.');
     }
 };
@@ -83,7 +82,6 @@ export const SubscribeToNewsLetter = async (req, res) => {
             return res.status(500).send({ error: "An error occurred while sending the confirmation email." });
         }
     } catch (error) {
-        console.error(error);
         return res.status(500).send({ error: "Sorry, an error occurred while processing your request." });
     }
 };

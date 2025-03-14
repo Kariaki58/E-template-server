@@ -143,7 +143,6 @@ const getAdminContent = async (req, res) => {
     }
 
   } catch (error) {
-    console.error('Error in getAdminContent:', error);
     return res.status(500).send({ error: 'An error occurred while processing the request' });
   }
 };
@@ -200,7 +199,6 @@ const getSettings = async (req, res) => {
 
     return res.status(200).send(data);
   } catch (error) {
-    console.error('Error fetching settings:', error);
     return res.status(500).send({ error: 'Server Error, please try again' });
   }
 };
@@ -214,7 +212,6 @@ const getAppLayout = async (req, res) => {
 
     return res.status(200).send(settings);
   } catch (error) {
-    console.error('Error fetching settings:', error);
     return res.status(500).send({ error: 'An error occurred while fetching the settings' });
   }
 }
